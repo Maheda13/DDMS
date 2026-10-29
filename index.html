@@ -7,34 +7,118 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #f8fafc;
-      color: #0f172a;
+    :root {
+      --bg-canvas: #EEF2F6;
+      --card-bg: #FFFFFF;
+      --primary-blue: #3B66F5;
+      --primary-blue-hover: #2952D9;
+      --folder-back: #638BFF;
+      --folder-front: #85A6FF;
+      --border-soft: #E6ECF5;
+      --border-active: #789DFF;
     }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-canvas);
+      color: #1E293B;
+    }
+
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .cloud-card {
+      background: #FFFFFF;
+      border-radius: 20px;
+      box-shadow: 0 10px 35px -10px rgba(30, 41, 59, 0.06), 0 2px 6px -1px rgba(30, 41, 59, 0.03);
+      border: 1px solid #E8EEF7;
+    }
+
+    .folder-tile::after {
+      content: attr(data-files-label);
+      display: block;
+      font-size: 11px;
+      color: #94A3B8;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .folder-tile {
+      background: #FFFFFF;
+      border: 1px solid #EEF2F8;
+      border-radius: 14px;
+      transition: all 0.18s ease;
+    }
+
+    .folder-tile:hover {
+      border-color: #B9CEFF;
+      box-shadow: 0 8px 20px -6px rgba(59, 102, 245, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .folder-tile.active-folder {
+      border: 1.5px solid #638BFF;
+      background: #F7FAFF;
+      box-shadow: 0 8px 22px -6px rgba(59, 102, 245, 0.16);
+    }
+
+    .file-tile {
+      background: transparent;
+      border: 1.5px solid transparent;
+      border-radius: 16px;
+      transition: all 0.18s ease;
+    }
+
+    .file-tile:hover {
+      background: #FFFFFF;
+      border-color: #DCE6F7;
+      box-shadow: 0 8px 24px -8px rgba(30, 41, 59, 0.08);
+    }
+
+    .file-tile.selected-file {
+      background: #FFFFFF;
+      border-color: #7D9FFF;
+      box-shadow: 0 14px 30px -8px rgba(59, 102, 245, 0.18), 0 4px 10px -2px rgba(59, 102, 245, 0.08);
+    }
+
+    .dropzone-dashed {
+      border: 1.5px dashed #CBD5E1;
+      border-radius: 16px;
+      background: #FAFBFD;
+      transition: all 0.18s ease;
+    }
+
+    .dropzone-dashed:hover {
+      border-color: #3B66F5;
+      background: #F4F7FF;
+    }
+
     .pdf-page-sheet {
-      background: #ffffff;
-      box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.18), 0 4px 10px -2px rgba(15, 23, 42, 0.08);
-      border: 1px solid #e2e8f0;
+      background: #FFFFFF;
+      box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.18);
+      border: 1px solid #E2E8F0;
       transition: transform 0.2s ease;
       transform-origin: top center;
     }
+
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f1f5f9;
+      background: #F1F5F9;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
+      background: #CBD5E1;
       border-radius: 9999px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
+      background: #94A3B8;
     }
+
     @media print {
       body * {
         visibility: hidden;
@@ -53,313 +137,385 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+<body class="min-h-screen flex flex-col">
 
-  <!-- TOP NOTIFICATION BANNER / TOAST CONTAINER -->
+  <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
-  <!-- HEADER UTAMA SMP DAFI -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- ===================================================================== -->
+  <!-- MINIMAL CLOUD WORKSPACE HEADER                                        -->
+  <!-- ===================================================================== -->
+  <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30">
+    <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-wrap items-center justify-between py-3 gap-3">
-        <!-- Brand & Identitas Sekolah -->
+        <!-- Brand Identity -->
         <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 flex items-center justify-center text-white shadow-md shadow-emerald-600/20 shrink-0">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          <div class="w-10 h-10 rounded-xl bg-[#3B66F5] flex items-center justify-center text-white shadow-md shadow-blue-500/25 shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
             </svg>
           </div>
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-bold text-lg tracking-tight text-slate-900">DDMS - DAFI Document Management System</span>
-              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">GitHub Pages + GAS</span>
+              <span class="font-extrabold text-base sm:text-lg tracking-tight text-slate-800">DDMS - DAFI Document Management System</span>
+              <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#3B66F5] border border-blue-200">SMP DAFI Cloud</span>
             </div>
-            <p class="text-xs text-slate-500">SMP DAFI • Manajemen Dokumen PDF Tata Tertib, SOP, SK &amp; Surat Administratif Pendidik</p>
+            <p class="text-xs text-slate-400">Public Share Library • Tata Tertib, SOP, SK &amp; Surat Administratif Pendidik</p>
           </div>
         </div>
 
-        <!-- Status Koneksi GAS & Kontrol Pengguna -->
-        <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
-          <!-- Indikator Mode Backend -->
-          <button type="button" onclick="switchMainTab('gas')" id="gasConnectionBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition">
+        <!-- Navigation Pills & User Controls -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <nav class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/70 overflow-x-auto">
+            <button type="button" onclick="switchMainTab('catalog')" id="tabBtn-catalog" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-[#3B66F5] shadow-xs whitespace-nowrap flex items-center gap-1.5 transition">
+              <span>Katalog Dokumen PDF</span>
+              <span id="navCountDocs" class="px-1.5 py-0.2 text-[10px] rounded-full bg-blue-50 text-[#3B66F5]">0</span>
+            </button>
+
+            <button type="button" onclick="switchMainTab('smart')" id="tabBtn-smart" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 whitespace-nowrap flex items-center gap-1.5 transition">
+              <span>Fitur Pintar &amp; Saran Dokumen</span>
+              <span id="navCountSmart" class="px-1.5 py-0.2 text-[10px] rounded-full bg-amber-100 text-amber-700 font-bold">0 Perlu Ditambah</span>
+            </button>
+
+            <button type="button" onclick="switchMainTab('history')" id="tabBtn-history" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 whitespace-nowrap transition">
+              <span>Riwayat Pembaruan Dokumen</span>
+            </button>
+
+            <button type="button" onclick="switchMainTab('gas')" id="tabBtn-gas" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 whitespace-nowrap transition">
+              <span>Integrasi GAS &amp; GitHub Pages</span>
+            </button>
+          </nav>
+
+          <button type="button" onclick="switchMainTab('gas')" id="gasConnectionBadge" class="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200/70 text-slate-600 transition">
             <span id="gasStatusDot" class="w-2 h-2 rounded-full bg-amber-500"></span>
             <span id="gasStatusText">Mode: Database Lokal (Siap Konek GAS)</span>
           </button>
 
-          <!-- Tombol Unggah PDF -->
-          <button type="button" onclick="handleOpenUploadModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-            </svg>
-            <span>Unggah PDF</span>
-          </button>
-
-          <!-- Area Status Login -->
           <div id="authHeaderArea" class="flex items-center gap-2"></div>
         </div>
       </div>
-
-      <!-- Navigasi Tab Utama -->
-      <nav class="flex items-center gap-1 overflow-x-auto pt-1 -mb-px border-t border-slate-100">
-        <button type="button" onclick="switchMainTab('catalog')" id="tabBtn-catalog" class="px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-emerald-600 text-emerald-700 whitespace-nowrap flex items-center gap-2 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-          </svg>
-          <span>Katalog Dokumen PDF</span>
-          <span id="navCountDocs" class="px-1.5 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800">0</span>
-        </button>
-
-        <button type="button" onclick="switchMainTab('smart')" id="tabBtn-smart" class="px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap flex items-center gap-2 transition">
-          <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-          </svg>
-          <span>Fitur Pintar &amp; Saran Dokumen</span>
-          <span id="navCountSmart" class="px-1.5 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800 font-semibold">0 Perlu Ditambah</span>
-        </button>
-
-        <button type="button" onclick="switchMainTab('history')" id="tabBtn-history" class="px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap flex items-center gap-2 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span>Riwayat Pembaruan Dokumen</span>
-        </button>
-
-        <button type="button" onclick="switchMainTab('gas')" id="tabBtn-gas" class="px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap flex items-center gap-2 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-          </svg>
-          <span>Integrasi GAS &amp; GitHub Pages</span>
-        </button>
-      </nav>
     </div>
   </header>
 
-  <!-- KONTEN UTAMA -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <!-- ===================================================================== -->
+  <!-- MAIN WORKSPACE (ADAPTED DIRECTLY FROM REFERENCE UI IMAGE)             -->
+  <!-- ===================================================================== -->
+  <main class="flex-1 max-w-[1360px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
     <!-- =================================================================== -->
-    <!-- TAB 1: KATALOG DOKUMEN PDF                                          -->
+    <!-- TAB 1: PUBLIC SHARE LIBRARY (LEFT) + UPLOAD & SHARE CARDS (RIGHT)   -->
     <!-- =================================================================== -->
-    <section id="tabPanel-catalog" class="space-y-6">
+    <section id="tabPanel-catalog">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-      <!-- Banner Info Hak Akses & Pintasan Fitur Pintar -->
-      <div class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 rounded-2xl p-4 sm:p-5 text-white shadow-md flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-        <div class="space-y-1">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span id="roleBannerBadge" class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">Mode Pengunjung Publik</span>
-            <span class="text-xs text-emerald-200">Domain Tetap GitHub Pages • Penyimpanan PDF Terpusat</span>
+        <!-- =============================================================== -->
+        <!-- LEFT PANEL (8 COLS): PUBLIC SHARE LIBRARY CARD                  -->
+        <!-- =============================================================== -->
+        <div class="lg:col-span-8 cloud-card p-6 sm:p-8 space-y-7">
+
+          <!-- Top Library Header Row (Matches Reference Image) -->
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Public Share Library</h1>
+                <button type="button" onclick="switchMainTab('smart')" class="text-slate-400 hover:text-[#3B66F5] transition p-1" title="Analisis Kelengkapan Arsip SMP DAFI">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                </button>
+                <span id="roleBannerBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Mode Pengunjung Publik</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+                <span>2.68 MB</span>
+                <span>|</span>
+                <span>Created By: <strong>SMP DAFI Sidoarjo</strong></span>
+                <span>•</span>
+                <span id="statAccessBreakdown" class="text-slate-400">4 Publik • 2 Internal Pendidik</span>
+              </p>
+              <p id="roleBannerDesc" class="sr-only">
+                Anda sedang mengakses halaman dengan domain publik.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" id="bannerLoginBtn" onclick="openLoginModal()" class="px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition">
+                Login Pendidik / Admin
+              </button>
+              <button type="button" onclick="handleOpenUploadModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-white text-xs sm:text-sm font-semibold shadow-md shadow-blue-500/20 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <span>Unggah PDF</span>
+              </button>
+            </div>
           </div>
-          <h1 class="text-lg sm:text-xl font-bold">Pusat Arsip Tata Tertib, SOP, SK &amp; Administrasi SMP DAFI</h1>
-          <p id="roleBannerDesc" class="text-xs sm:text-sm text-emerald-100 max-w-3xl">
-            Anda sedang mengakses halaman dengan domain publik. Dokumen berlabel <strong>Publik</strong> dapat langsung dibaca di aplikasi, sedangkan dokumen <strong>Internal Pendidik</strong> dan fitur <strong>Unggah/Revisi PDF</strong> memerlukan login Guru, Kepala Sekolah, atau Admin TU.
-          </p>
-        </div>
-        <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
-          <button type="button" onclick="switchMainTab('smart')" class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-            <span>Cek Saran Dokumen Belum Ada</span>
-          </button>
-          <button type="button" id="bannerLoginBtn" onclick="openLoginModal()" class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm border border-white/20 transition">
-            Login Pendidik / Admin
-          </button>
-        </div>
-      </div>
 
-      <!-- 4 Kartu Metrik Ringkas (Klik untuk Filter Cepat) -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <button type="button" onclick="quickFilterCategory('ALL')" class="bg-white p-4 rounded-xl border border-slate-200 hover:border-emerald-500 text-left transition shadow-sm group">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-medium text-slate-500">Total Dokumen PDF</span>
-            <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-              </svg>
-            </span>
+          <!-- 5 FOLDER CARDS ROW (Exact Adaptation of Top Folder Grid in Reference Image) -->
+          <div class="hidden">
+            <span id="statTotalDocs">6</span>
+            <span id="folderCountTatib">2</span>
+            <span id="statSopTatib">2</span>
+            <span id="statSkSurat">1</span>
+            <span id="folderCountSurat">1</span>
           </div>
-          <div id="statTotalDocs" class="text-2xl font-bold text-slate-900 mt-2">0</div>
-          <p id="statAccessBreakdown" class="text-xs text-slate-500 mt-1">0 Publik • 0 Internal Pendidik</p>
-        </button>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5" id="categoryPillsContainer">
+            <!-- Folder 1: Semua Kategori -->
+            <button type="button" id="folderBtnAll" onclick="quickFilterCategory('ALL')" data-cat="ALL" data-files-label="(6) Files" class="cat-pill folder-tile active-folder p-4 text-center flex flex-col items-center justify-between group">
+              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
+                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
+                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
+                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
+                </svg>
+              </div>
+              <div class="text-xs font-bold text-slate-700 leading-snug">Semua Kategori</div>
+            </button>
 
-        <button type="button" onclick="quickFilterCategory('SOP')" class="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-500 text-left transition shadow-sm group">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-medium text-slate-500">SOP &amp; Tata Tertib</span>
-            <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-              </svg>
-            </span>
-          </div>
-          <div id="statSopTatib" class="text-2xl font-bold text-slate-900 mt-2">0</div>
-          <p class="text-xs text-slate-500 mt-1">Pedoman &amp; standar operasional</p>
-        </button>
+            <!-- Folder 2: Tata Tertib -->
+            <button type="button" id="folderBtnTatib" onclick="quickFilterCategory('Tata Tertib')" data-cat="Tata Tertib" data-files-label="(2) Files" class="cat-pill folder-tile p-4 text-center flex flex-col items-center justify-between group">
+              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
+                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
+                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
+                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
+                </svg>
+              </div>
+              <div class="text-xs font-bold text-slate-700 leading-snug">Tata Tertib</div>
+            </button>
 
-        <button type="button" onclick="quickFilterCategory('SK')" class="bg-white p-4 rounded-xl border border-slate-200 hover:border-purple-500 text-left transition shadow-sm group">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-medium text-slate-500">SK &amp; Surat Administratif</span>
-            <span class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-              </svg>
-            </span>
-          </div>
-          <div id="statSkSurat" class="text-2xl font-bold text-slate-900 mt-2">0</div>
-          <p class="text-xs text-slate-500 mt-1">SK Kepsek &amp; surat edaran resmi</p>
-        </button>
+            <!-- Folder 3: SOP Sekolah -->
+            <button type="button" id="folderBtnSop" onclick="quickFilterCategory('SOP')" data-cat="SOP" data-files-label="(2) Files" class="cat-pill folder-tile p-4 text-center flex flex-col items-center justify-between group">
+              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
+                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
+                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
+                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
+                </svg>
+              </div>
+              <div class="text-xs font-bold text-slate-700 leading-snug">SOP Sekolah</div>
+            </button>
 
-        <button type="button" onclick="switchMainTab('smart')" class="bg-white p-4 rounded-xl border border-slate-200 hover:border-amber-500 text-left transition shadow-sm group">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-medium text-slate-500">Kelengkapan Arsip Wajib</span>
-            <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </span>
-          </div>
-          <div id="statSmartCompleteness" class="text-2xl font-bold text-amber-600 mt-2">0%</div>
-          <p id="statSmartSubtext" class="text-xs text-slate-500 mt-1">Klik untuk lihat saran dokumen</p>
-        </button>
-      </div>
+            <!-- Folder 4: SK (Surat Keputusan) -->
+            <button type="button" id="folderBtnSk" onclick="quickFilterCategory('SK')" data-cat="SK" data-files-label="(1) Files" class="cat-pill folder-tile p-4 text-center flex flex-col items-center justify-between group">
+              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
+                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
+                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
+                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
+                </svg>
+              </div>
+              <div class="text-xs font-bold text-slate-700 leading-snug">SK (Surat Keputusan)</div>
+            </button>
 
-      <!-- Panel Pencarian & Filter Multi-Kriteria -->
-      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
-          <!-- Input Pencarian Kata Kunci, Judul, Pembuat, Nomor -->
-          <div class="lg:col-span-5 relative">
-            <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            <input type="text" id="searchInput" oninput="renderCatalog()" placeholder="Cari judul, nomor SK/SOP, kata kunci, atau pembuat..." class="w-full pl-10 pr-9 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition">
-            <button type="button" id="clearSearchBtn" onclick="clearSearchAndFilters()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1" title="Bersihkan pencarian">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
+            <!-- Folder 5: Surat Administratif -->
+            <button type="button" id="folderBtnSurat" onclick="quickFilterCategory('Surat Administratif')" data-cat="Surat Administratif" data-files-label="(1) Files" class="cat-pill folder-tile p-4 text-center flex flex-col items-center justify-between group col-span-2 sm:col-span-1">
+              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
+                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
+                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
+                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
+                </svg>
+              </div>
+              <div class="text-xs font-bold text-slate-700 leading-snug">Surat Administratif</div>
             </button>
           </div>
 
-          <!-- Filter Pembuat / Unit -->
-          <div class="lg:col-span-3">
-            <select id="filterCreator" onchange="renderCatalog()" class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:border-emerald-600 outline-none">
-              <option value="ALL">Semua Pembuat / Unit</option>
-              <option value="Kepala Sekolah">Kepala Sekolah</option>
-              <option value="Waka Kurikulum">Waka Kurikulum</option>
-              <option value="Waka Kesiswaan">Waka Kesiswaan</option>
-              <option value="Kepala TU">Kepala TU / Administrasi</option>
-              <option value="Tim Penjaminan Mutu">Tim Penjaminan Mutu</option>
-            </select>
-          </div>
+          <!-- Compact Search & Filter Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-100">
+            <div class="relative flex-1 min-w-[220px]">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input type="text" id="searchInput" oninput="renderCatalog()" placeholder="Cari judul dokumen, nomor SK/SOP, kata kunci, atau pembuat..." class="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200/90 focus:bg-white focus:border-[#3B66F5] outline-none transition">
+              <button type="button" id="clearSearchBtn" onclick="clearSearchAndFilters()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold" title="Bersihkan">
+                ✕
+              </button>
+            </div>
 
-          <!-- Filter Tingkat Akses -->
-          <div class="lg:col-span-2">
-            <select id="filterAccess" onchange="renderCatalog()" class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:border-emerald-600 outline-none">
-              <option value="ALL">Semua Hak Akses</option>
-              <option value="Publik">Publik (Terbuka)</option>
-              <option value="Internal Pendidik">Internal Pendidik</option>
-            </select>
-          </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <select id="filterCreator" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none">
+                <option value="ALL">Semua Unit</option>
+                <option value="Kepala Sekolah">Kepala Sekolah</option>
+                <option value="Waka Kurikulum">Waka Kurikulum</option>
+                <option value="Waka Kesiswaan">Waka Kesiswaan</option>
+                <option value="Kepala TU">Kepala TU</option>
+                <option value="Tim Penjaminan Mutu">Tim Penjaminan Mutu</option>
+              </select>
 
-          <!-- Urutan -->
-          <div class="lg:col-span-2">
-            <select id="sortOrder" onchange="renderCatalog()" class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:border-emerald-600 outline-none">
-              <option value="newest">Terbaru Diperbarui</option>
-              <option value="title">Judul (A - Z)</option>
-              <option value="version">Jumlah Revisi</option>
-            </select>
-          </div>
-        </div>
+              <select id="filterAccess" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none">
+                <option value="ALL">Semua Akses</option>
+                <option value="Publik">Publik</option>
+                <option value="Internal Pendidik">Internal Pendidik</option>
+              </select>
 
-        <!-- Baris Filter Kategori (Pills) & Toggle Tampilan -->
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
-          <div class="flex items-center gap-1.5 flex-wrap" id="categoryPillsContainer">
-            <button type="button" onclick="quickFilterCategory('ALL')" data-cat="ALL" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition">Semua Kategori</button>
-            <button type="button" onclick="quickFilterCategory('Tata Tertib')" data-cat="Tata Tertib" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Tata Tertib</button>
-            <button type="button" onclick="quickFilterCategory('SOP')" data-cat="SOP" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">SOP Sekolah</button>
-            <button type="button" onclick="quickFilterCategory('SK')" data-cat="SK" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">SK (Surat Keputusan)</button>
-            <button type="button" onclick="quickFilterCategory('Surat Administratif')" data-cat="Surat Administratif" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Surat Administratif</button>
-          </div>
+              <select id="sortOrder" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none">
+                <option value="newest">Terbaru</option>
+                <option value="title">Judul A-Z</option>
+                <option value="version">Versi</option>
+              </select>
 
-          <div class="flex items-center gap-2">
-            <span id="filterResultInfo" class="text-xs text-slate-500">Menampilkan 0 dokumen</span>
-            <div class="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-100">
-              <button type="button" onclick="setViewMode('grid')" id="viewBtnGrid" class="px-2.5 py-1 rounded-md text-xs font-medium bg-white text-slate-800 shadow-sm">Kartu</button>
-              <button type="button" onclick="setViewMode('table')" id="viewBtnTable" class="px-2.5 py-1 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900">Tabel</button>
+              <div class="inline-flex rounded-xl bg-slate-100 p-0.5 border border-slate-200/70">
+                <button type="button" onclick="setViewMode('grid')" id="viewBtnGrid" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs">Kartu</button>
+                <button type="button" onclick="setViewMode('table')" id="viewBtnTable" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800">Tabel</button>
+              </div>
             </div>
           </div>
+
+          <!-- Hidden / Compact Smart Completeness Bar -->
+          <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#F5F8FF] border border-[#DCE6FF] text-xs">
+            <div class="flex items-center gap-2 text-slate-600">
+              <span class="w-2 h-2 rounded-full bg-[#3B66F5]"></span>
+              <span id="filterResultInfo" class="font-medium">Menampilkan 6 dokumen</span>
+              <span class="text-slate-300">|</span>
+              <span>Kelengkapan Standar Sekolah: <strong id="statSmartCompleteness" class="text-[#3B66F5]">60%</strong> (<span id="statSmartSubtext">4 saran dokumen</span>)</span>
+            </div>
+            <button type="button" onclick="switchMainTab('smart')" class="font-semibold text-[#3B66F5] hover:underline shrink-0">
+              Cek Saran Dokumen Belum Ada
+            </button>
+          </div>
+
+          <!-- FILE ICON GRID / TABLE CONTAINER (Matches Reference File Tiles) -->
+          <div id="catalogContainer"></div>
+
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- RIGHT PANEL (4 COLS): STACKED "UPLOAD FILE" + "SHARE" CARDS     -->
+        <!-- =============================================================== -->
+        <div class="lg:col-span-4 space-y-6">
+
+          <!-- TOP-RIGHT CARD: "Upload File" (Exact Match to Reference Image) -->
+          <div class="cloud-card p-6 space-y-5">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-bold text-slate-800">Upload File</h2>
+              <span class="text-[11px] font-medium text-slate-400">Google Drive + Sheets</span>
+            </div>
+
+            <!-- Dashed Dropzone Box -->
+            <div class="dropzone-dashed p-5 text-center space-y-3">
+              <div class="w-10 h-10 rounded-full bg-blue-50 text-[#3B66F5] flex items-center justify-center mx-auto">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="text-sm font-semibold text-slate-700">Drag your files here</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">PDF Tata Tertib, SOP, SK, and Surat formats, up to 15 MB</p>
+              </div>
+              <div>
+                <button type="button" onclick="handleOpenUploadModal()" class="px-5 py-2 rounded-lg bg-[#3B66F5] hover:bg-[#2952D9] text-white text-xs font-semibold shadow-sm shadow-blue-500/20 transition">
+                  Browse Files
+                </button>
+              </div>
+
+              <!-- Quick Check / Drive URL Bar with '+' Button (Matches Reference Image) -->
+              <div class="pt-2">
+                <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1 pl-3 shadow-2xs">
+                  <input type="text" id="quickSidebarCheckInput" placeholder="https://drive.google.com/drive/folders/arsip-dafi..." class="w-full text-[11px] text-slate-600 outline-none bg-transparent truncate">
+                  <button type="button" onclick="handleQuickSidebarAction()" class="w-7 h-7 rounded-lg bg-[#3B66F5] hover:bg-[#2952D9] text-white flex items-center justify-center shrink-0 font-bold text-sm transition" title="Cek Duplikasi / Tambah Cepat">
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Upload & Recent Revision Queue Rows (Matches Reference Image) -->
+            <div id="sidebarUploadQueue" class="space-y-2.5"></div>
+          </div>
+
+          <!-- BOTTOM-RIGHT CARD: "Share / Detail & Akses Dokumen" (Exact Match to Reference Image) -->
+          <div class="cloud-card p-6 space-y-4">
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-slate-800 leading-snug">
+                Share &ldquo;<span id="shareCardDocTitle" class="text-[#3B66F5]">Tata Tertib Guru.pdf</span>&rdquo;
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Invite teachers &amp; school leaders to <strong>view, edit,</strong> and <strong>share</strong> official SMP DAFI documents.
+              </p>
+            </div>
+
+            <!-- Input Add Person / Change Access Level -->
+            <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white">
+              <div class="flex items-center gap-2 flex-1 min-w-0">
+                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                </svg>
+                <input type="text" id="shareInviteInput" placeholder="add a teacher, unit, or email..." class="w-full text-xs text-slate-700 outline-none bg-transparent">
+              </div>
+              <select id="shareAccessQuickSelect" onchange="handleQuickAccessChange()" class="text-xs font-semibold text-[#3B66F5] bg-transparent outline-none cursor-pointer">
+                <option value="Publik">can view (Publik)</option>
+                <option value="Internal Pendidik">internal only</option>
+              </select>
+            </div>
+
+            <!-- People / Role Access List with Circular Initial Avatars -->
+            <div id="sharePeopleList" class="space-y-3 pt-1"></div>
+
+            <!-- Quick Action Strip for Selected Document -->
+            <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
+              <button type="button" onclick="openSelectedDocViewer()" class="flex-1 py-2 px-3 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-white text-xs font-semibold transition">
+                Baca PDF di Aplikasi
+              </button>
+              <button type="button" onclick="openSelectedDocRevision()" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
+                Revisi Versi
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
-
-      <!-- Daftar Dokumen (Grid / Tabel) -->
-      <div id="catalogContainer"></div>
     </section>
 
     <!-- =================================================================== -->
     <!-- TAB 2: FITUR PINTAR & SARAN DOKUMEN (SMART GAP ANALYSIS)            -->
     <!-- =================================================================== -->
     <section id="tabPanel-smart" class="hidden space-y-6">
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+      <div class="cloud-card p-6 sm:p-7">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-100">
           <div class="space-y-1">
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
-              <span>Asisten Arsip Pintar SMP DAFI</span>
-            </div>
-            <h2 class="text-xl font-bold text-slate-900">Analisis Kelengkapan &amp; Rekomendasi Dokumen Sekolah</h2>
-            <p class="text-sm text-slate-600 max-w-3xl">
-              Sistem membandingkan dokumen yang sudah terunggah dengan daftar standar dokumen wajib SMP DAFI, mendeteksi dokumen yang belum tersedia, serta memberi peringatan jika ada dokumen yang perlu diperbarui.
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-[#3B66F5]">
+              Asisten Pintar DDMS SMP DAFI
+            </span>
+            <h2 class="text-xl font-bold text-slate-800">Analisis Kelengkapan &amp; Saran Dokumen Wajib Sekolah</h2>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-3xl">
+              Mendeteksi dokumen standar SMP DAFI yang belum diunggah serta memeriksa kemiripan dokumen secara otomatis agar tidak terjadi duplikasi berkas PDF.
             </p>
           </div>
-          <div class="flex items-center gap-3">
-            <button type="button" onclick="openAddStandardModal()" class="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-50 text-xs sm:text-sm font-semibold text-slate-700 transition">
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <button type="button" onclick="openAddStandardModal()" class="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition">
               + Tambah Target Dokumen Wajib
             </button>
-            <button type="button" onclick="handleOpenUploadModal()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs sm:text-sm font-semibold text-white transition">
+            <button type="button" onclick="handleOpenUploadModal()" class="px-4 py-2 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-xs font-semibold text-white shadow-sm transition">
               Unggah &amp; Cek Duplikasi
             </button>
           </div>
         </div>
 
-        <!-- Bar Progress Kelengkapan Per Kategori -->
         <div id="smartCategoryProgress" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5"></div>
       </div>
 
       <!-- Simulator Cek Kemiripan / Duplikasi Cepat -->
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
+      <div class="cloud-card p-6 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 class="text-base font-bold text-slate-900">Pengecek Pintar Duplikasi &amp; Kemiripan Dokumen</h3>
-            <p class="text-xs sm:text-sm text-slate-500">Ketik rencana judul atau nomor dokumen di bawah ini untuk mengecek apakah dokumen tersebut sudah pernah diunggah sebelumnya.</p>
+            <h3 class="text-base font-bold text-slate-800">Pengecek Pintar Duplikasi &amp; Kemiripan Dokumen</h3>
+            <p class="text-xs text-slate-400">Ketik rencana judul atau nomor SK/SOP untuk mengecek apakah dokumen sudah ada di penyimpanan SMP DAFI.</p>
           </div>
-          <span class="text-xs font-medium px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">Aktif Otomatis Saat Upload</span>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-[#3B66F5]">Aktif Otomatis Saat Upload</span>
         </div>
-        <div class="relative">
-          <input type="text" id="smartCheckInput" oninput="runInteractiveDuplicateCheck()" placeholder="Coba ketik: 'Tata Tertib Guru', 'SOP Laboratorium', atau 'SK Pembagian Tugas'..." class="w-full px-4 py-3 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none">
-        </div>
-        <div id="smartCheckResultBox" class="rounded-xl p-4 bg-slate-50 border border-slate-200 text-sm text-slate-600">
-          Masukkan kata kunci atau rencana judul dokumen di atas untuk melihat analisis kemiripan dengan arsip SMP DAFI yang sudah ada.
+        <input type="text" id="smartCheckInput" oninput="runInteractiveDuplicateCheck()" placeholder="Coba ketik: 'Tata Tertib Guru', 'SOP KBM', atau 'SK Pembagian Tugas'..." class="w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#3B66F5] outline-none">
+        <div id="smartCheckResultBox" class="rounded-xl p-4 bg-slate-50 border border-slate-200/80 text-xs sm:text-sm text-slate-500">
+          Masukkan kata kunci atau rencana judul dokumen di atas untuk melihat analisis kemiripan dengan arsip DDMS SMP DAFI.
         </div>
       </div>
 
-      <!-- Daftar Saran Dokumen yang Perlu Ditambahkan & Sudah Terpenuhi -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Kolom Kiri: Dokumen Wajib yang BELUM ADA -->
         <div class="lg:col-span-7 space-y-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-              <span>Saran Dokumen yang Perlu Ditambahkan</span>
-            </h3>
+            <h3 class="text-base font-bold text-slate-800">Saran Dokumen yang Perlu Ditambahkan</h3>
             <span id="missingDocsBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">0 Dokumen</span>
           </div>
           <div id="smartMissingList" class="space-y-3"></div>
         </div>
 
-        <!-- Kolom Kanan: Dokumen Standar yang SUDAH ADA & Perlu Review Berkala -->
         <div class="lg:col-span-5 space-y-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <span>Dokumen Standar yang Sudah Tersedia</span>
-            </h3>
+            <h3 class="text-base font-bold text-slate-800">Dokumen Standar yang Sudah Tersedia</h3>
             <span id="fulfilledDocsBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">0 Terpenuhi</span>
           </div>
           <div id="smartFulfilledList" class="space-y-3"></div>
@@ -368,109 +524,84 @@
     </section>
 
     <!-- =================================================================== -->
-    <!-- TAB 3: RIWAYAT PEMBARUAN DOKUMEN (VERSION HISTORY & AUDIT TRAIL)    -->
+    <!-- TAB 3: RIWAYAT PEMBARUAN DOKUMEN                                    -->
     <!-- =================================================================== -->
     <section id="tabPanel-history" class="hidden space-y-6">
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+      <div class="cloud-card p-6 sm:p-7">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
           <div>
-            <h2 class="text-xl font-bold text-slate-900">Riwayat Pembaruan &amp; Revisi Dokumen (Audit Trail)</h2>
-            <p class="text-sm text-slate-600 mt-1">
-              Rekam jejak seluruh perubahan versi dokumen Tata Tertib, SOP, SK, dan Surat Administratif SMP DAFI beserta catatan revisi dan pengunggahnya.
+            <h2 class="text-xl font-bold text-slate-800">Riwayat Pembaruan &amp; Revisi Dokumen (Version History)</h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
+              Jejak kronologis seluruh pembaruan versi dokumen Tata Tertib, SOP, SK, dan Surat Administratif di DDMS SMP DAFI.
             </p>
           </div>
           <div class="w-full sm:w-64">
-            <select id="historyDocFilter" onchange="renderGlobalHistory()" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 bg-white outline-none focus:border-emerald-600">
+            <select id="historyDocFilter" onchange="renderGlobalHistory()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-[#3B66F5]">
               <option value="ALL">Semua Dokumen</option>
             </select>
           </div>
         </div>
-
-        <div id="globalHistoryTimeline" class="mt-6 space-y-4"></div>
+        <div id="globalHistoryTimeline" class="mt-5 space-y-3.5"></div>
       </div>
     </section>
 
     <!-- =================================================================== -->
-    <!-- TAB 4: INTEGRASI GAS & GITHUB PAGES (SETUP & KODE LENGKAP)          -->
+    <!-- TAB 4: INTEGRASI GAS & GITHUB PAGES                                 -->
     <!-- =================================================================== -->
     <section id="tabPanel-gas" class="hidden space-y-6">
-      <!-- Form Koneksi URL Web App GAS -->
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Konfigurasi Endpoint API</span>
-            <h2 class="text-xl font-bold text-slate-900">Hubungkan GitHub Pages dengan Google Apps Script (GAS)</h2>
-            <p class="text-sm text-slate-600 mt-0.5">
-              Dengan menaruh tampilan ini di <strong>GitHub Pages</strong>, domain aplikasi sekolah Anda bersifat tetap. Saat kode GAS diperbarui, cukup tempelkan URL Web App GAS di bawah ini.
-            </p>
-          </div>
+      <div class="cloud-card p-6 sm:p-7 space-y-4">
+        <div>
+          <span class="text-xs font-semibold text-[#3B66F5]">Konfigurasi Endpoint Cloud</span>
+          <h2 class="text-xl font-bold text-slate-800">Hubungkan GitHub Pages dengan Google Apps Script (GAS)</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Domain GitHub Pages Anda bersifat tetap. Saat script GAS diperbarui, cukup tempelkan URL Web App GAS di bawah ini.
+          </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 pt-2">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
           <div class="lg:col-span-9">
-            <label for="gasUrlInput" class="block text-xs font-semibold text-slate-700 mb-1">URL Web App Google Apps Script (`https://script.google.com/macros/s/.../exec`)</label>
-            <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/AKfycbx.../exec" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 outline-none font-mono">
+            <label for="gasUrlInput" class="block text-xs font-semibold text-slate-600 mb-1">URL Web App Google Apps Script (`https://script.google.com/macros/s/.../exec`)</label>
+            <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/AKfycbx.../exec" class="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#3B66F5] outline-none font-mono-code">
           </div>
-          <div class="lg:col-span-3 flex items-end gap-2">
-            <button type="button" onclick="saveAndTestGasUrl()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition">
+          <div class="lg:col-span-3 flex items-end">
+            <button type="button" onclick="saveAndTestGasUrl()" class="w-full py-2.5 px-4 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-white font-semibold text-xs sm:text-sm transition">
               Simpan &amp; Sinkronkan
             </button>
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 text-xs text-slate-500">
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 text-xs text-slate-400">
           <span id="gasSavedStatusNote">Saat URL dikosongkan, aplikasi berjalan dalam Mode Database Lokal (tersimpan di browser) untuk demonstrasi penuh.</span>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="syncFromGasBackend()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium">Muat Ulang dari GAS</button>
-            <button type="button" onclick="resetDemoDatabase()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium">Reset Data Sampel SMP DAFI</button>
+            <button type="button" onclick="syncFromGasBackend()" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 font-medium">Muat Ulang dari GAS</button>
+            <button type="button" onclick="resetDemoDatabase()" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 font-medium">Reset Data Sampel SMP DAFI</button>
           </div>
         </div>
       </div>
 
-      <!-- Langkah-langkah Deploy & Kode Backend Code.gs -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Panduan Langkah Demi Langkah -->
-        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
-          <h3 class="text-base font-bold text-slate-900">Panduan Cepat Implementasi di SMP DAFI</h3>
-          <ol class="space-y-3 text-xs sm:text-sm text-slate-700 list-decimal list-inside leading-relaxed">
-            <li>
-              <strong>Buat Google Sheets Baru:</strong> Buka Google Drive akun sekolah, buat Google Spreadsheet baru dengan nama <code class="px-1.5 py-0.5 bg-slate-100 rounded text-slate-800">Database DDMS SMP DAFI</code>.
-            </li>
-            <li>
-              <strong>Pasang Kode GAS:</strong> Klik menu <strong>Ekstensi &gt; Apps Script</strong>, hapus kode bawaan, lalu tempel seluruh kode <code class="px-1.5 py-0.5 bg-slate-100 rounded text-slate-800">Code.gs</code> di samping.
-            </li>
-            <li>
-              <strong>Inisialisasi Otomatis:</strong> Pilih fungsi <code class="px-1.5 py-0.5 bg-emerald-50 text-emerald-800 font-mono">setupDatabase</code> di toolbar atas lalu klik <strong>Jalankan (Run)</strong>. Script otomatis membuat 4 sheet (<em>Documents, VersionHistory, Users, SuggestedDocs</em>) serta folder Google Drive <code class="px-1.5 py-0.5 bg-slate-100 rounded">Arsip_PDF_SMP_DAFI</code>.
-            </li>
-            <li>
-              <strong>Deploy sebagai Web App:</strong> Klik <strong>Terapkan &gt; Deployment baru</strong>, pilih jenis <strong>Aplikasi Web</strong>, atur <em>Execute as: Me</em> dan <em>Who has access: Anyone</em>. Salin URL <code class="px-1.5 py-0.5 bg-slate-100 rounded">/exec</code> yang muncul.
-            </li>
-            <li>
-              <strong>Hosting Domain Tetap di GitHub Pages:</strong> Buat repositori GitHub (mis. <code class="px-1.5 py-0.5 bg-slate-100 rounded">ddms-smp-dafi</code>), unggah file <code class="px-1.5 py-0.5 bg-slate-100 rounded">index.html</code> ini, lalu aktifkan <strong>Settings &gt; Pages</strong> pada branch <code class="px-1.5 py-0.5 bg-slate-100 rounded">main</code>.
-            </li>
+        <div class="lg:col-span-5 cloud-card p-6 space-y-4">
+          <h3 class="text-base font-bold text-slate-800">Langkah Pemasangan DDMS SMP DAFI</h3>
+          <ol class="space-y-3 text-xs sm:text-sm text-slate-600 list-decimal list-inside leading-relaxed">
+            <li><strong>Buat Google Sheets:</strong> Beri nama <code class="px-1.5 py-0.5 bg-slate-100 rounded text-slate-800">Database DDMS SMP DAFI</code>.</li>
+            <li><strong>Pasang Kode GAS:</strong> Buka <strong>Ekstensi &gt; Apps Script</strong>, lalu tempel kode <code class="px-1.5 py-0.5 bg-slate-100 rounded">Code.gs</code> di samping.</li>
+            <li><strong>Inisialisasi:</strong> Jalankan fungsi <code class="px-1.5 py-0.5 bg-blue-50 text-[#3B66F5] font-mono-code">setupDatabase</code> sekali dari editor Apps Script.</li>
+            <li><strong>Deploy Web App:</strong> Pilih <strong>Terapkan &gt; Deployment baru &gt; Aplikasi Web</strong> (<em>Execute as: Me</em>, <em>Who has access: Anyone</em>).</li>
+            <li><strong>GitHub Pages:</strong> Unggah file <code class="px-1.5 py-0.5 bg-slate-100 rounded">index.html</code> ke repositori <code class="px-1.5 py-0.5 bg-slate-100 rounded">ddms-smp-dafi</code>.</li>
           </ol>
-
-          <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1">
-            <div class="font-bold">Keunggulan Arsitektur Ini:</div>
-            <p>Menggunakan <code class="font-mono">Content-Type: text/plain;charset=utf-8</code> pada request <code class="font-mono">fetch()</code> POST ke GAS sehingga pengiriman PDF Base64 dari domain GitHub Pages tidak pernah terblokir oleh aturan CORS browser.</p>
-          </div>
         </div>
 
-        <!-- Kode Lengkap Code.gs Siap Salin -->
-        <div class="lg:col-span-7 bg-slate-900 rounded-2xl border border-slate-800 p-5 shadow-sm flex flex-col">
+        <div class="lg:col-span-7 bg-slate-900 rounded-2xl p-5 shadow-md flex flex-col">
           <div class="flex items-center justify-between pb-3 border-b border-slate-800">
             <div>
-              <span class="text-xs font-mono text-emerald-400">Code.gs — Google Apps Script Backend</span>
+              <span class="text-xs font-mono-code text-blue-400">Code.gs — Google Apps Script Backend</span>
               <h3 class="text-sm font-bold text-white">Kode Server Otomatis (Google Sheets + Google Drive PDF)</h3>
             </div>
-            <button type="button" onclick="copyGasCode()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-              </svg>
+            <button type="button" onclick="copyGasCode()" class="px-3 py-1.5 rounded-lg bg-[#3B66F5] hover:bg-[#2952D9] text-white text-xs font-semibold transition">
               <span id="copyGasBtnText">Salin Kode Code.gs</span>
             </button>
           </div>
-          <pre id="gasCodeBlock" class="mt-3 text-xs font-mono text-slate-200 overflow-x-auto overflow-y-auto max-h-96 custom-scrollbar leading-relaxed select-all p-2"></pre>
+          <pre id="gasCodeBlock" class="mt-3 text-xs font-mono-code text-slate-200 overflow-x-auto overflow-y-auto max-h-96 custom-scrollbar leading-relaxed select-all p-2"></pre>
         </div>
       </div>
     </section>
@@ -478,13 +609,13 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="bg-white border-t border-slate-200 mt-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+  <footer class="bg-white/70 border-t border-slate-200/70 mt-10">
+    <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
       <div>
         <strong>DDMS - DAFI Document Management System</strong> • SMP DAFI • Manajemen Dokumen PDF Tata Tertib, SOP, SK &amp; Surat Administratif
       </div>
       <div>
-        Arsitektur Domain Tetap GitHub Pages + Google Apps Script API
+        Cloud Library UI • GitHub Pages + Google Apps Script
       </div>
     </div>
   </footer>
@@ -492,75 +623,63 @@
   <!-- ===================================================================== -->
   <!-- MODAL 1: IN-APP PDF READER & RIWAYAT VERSI                            -->
   <!-- ===================================================================== -->
-  <div id="pdfViewerModal" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+  <div id="pdfViewerModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4">
     <div class="bg-white rounded-2xl w-full max-w-6xl h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
-      <!-- Top Bar PDF Reader -->
       <div class="bg-slate-900 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-3 shrink-0">
         <div class="flex items-center gap-3 min-w-0">
-          <span id="viewerDocCategoryBadge" class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">SOP</span>
+          <span id="viewerDocCategoryBadge" class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30 shrink-0">SOP</span>
           <div class="min-w-0">
             <h3 id="viewerDocTitle" class="text-sm sm:text-base font-bold truncate">Judul Dokumen</h3>
             <p id="viewerDocSubtitle" class="text-xs text-slate-400 truncate">Nomor Dokumen • Pembuat</p>
           </div>
         </div>
 
-        <!-- Kontrol Versi, Zoom & Cetak -->
         <div class="flex items-center gap-2 flex-wrap">
           <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
             <span class="text-xs text-slate-400">Versi:</span>
-            <select id="viewerVersionSelect" onchange="handleViewerVersionChange()" class="bg-transparent text-xs font-semibold text-emerald-300 outline-none cursor-pointer"></select>
+            <select id="viewerVersionSelect" onchange="handleViewerVersionChange()" class="bg-transparent text-xs font-semibold text-blue-300 outline-none cursor-pointer"></select>
           </div>
 
           <div class="hidden sm:flex items-center bg-slate-800 rounded-lg border border-slate-700 p-0.5">
             <button type="button" onclick="adjustPdfZoom(-0.1)" class="px-2 py-1 text-xs hover:bg-slate-700 rounded text-slate-200" title="Perkecil">-</button>
-            <span id="pdfZoomLabel" class="px-2 text-xs font-mono text-slate-300">100%</span>
+            <span id="pdfZoomLabel" class="px-2 text-xs font-mono-code text-slate-300">100%</span>
             <button type="button" onclick="adjustPdfZoom(0.1)" class="px-2 py-1 text-xs hover:bg-slate-700 rounded text-slate-200" title="Perbesar">+</button>
           </div>
 
-          <button type="button" onclick="printCurrentPdf()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition flex items-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-            </svg>
+          <button type="button" onclick="printCurrentPdf()" class="px-3 py-1.5 rounded-lg bg-[#3B66F5] hover:bg-[#2952D9] text-xs font-semibold text-white transition">
             <span>Cetak / Simpan PDF</span>
           </button>
 
-          <button type="button" onclick="closePdfViewerModal()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition" title="Tutup Pembaca PDF">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
+          <button type="button" onclick="closePdfViewerModal()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition" title="Tutup">
+            [TUTUP]
           </button>
         </div>
       </div>
 
-      <!-- Body Pembaca PDF: Area Lembar PDF (Kiri) + Sidebar Metadata & Riwayat Versi (Kanan) -->
-      <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden bg-slate-200">
-        <!-- Area Render PDF -->
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden bg-slate-100">
         <div class="lg:col-span-8 h-full overflow-y-auto p-3 sm:p-6 flex flex-col items-center custom-scrollbar" id="pdfCanvasScrollContainer">
-          <!-- Jika ada file PDF asli (Blob/Drive iframe), tampilkan opsi switch atau iframe -->
-          <div id="externalPdfNotice" class="hidden w-full max-w-3xl mb-3 p-3 rounded-xl bg-emerald-900 text-white text-xs flex items-center justify-between gap-2">
+          <div id="externalPdfNotice" class="hidden w-full max-w-3xl mb-3 p-3 rounded-xl bg-[#3B66F5] text-white text-xs flex items-center justify-between gap-2">
             <span id="externalPdfNoticeText">Menampilkan file PDF asli yang diunggah / terhubung ke Google Drive.</span>
-            <a id="externalPdfDirectLink" href="https://drive.google.com" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded bg-white text-emerald-950 font-semibold shrink-0">Buka Tab Baru</a>
+            <a id="externalPdfDirectLink" href="https://drive.google.com" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-white text-[#3B66F5] font-semibold shrink-0">Buka Tab Baru</a>
           </div>
 
           <iframe id="nativePdfIframe" title="Pratinjau Dokumen PDF" class="hidden w-full h-full min-h-[520px] rounded-xl bg-white border border-slate-300 shadow"></iframe>
 
-          <!-- Lembar Dokumen Resmi PDF SMP DAFI (In-App Interactive Document Reader) -->
-          <div id="printablePdfArea" class="pdf-page-sheet w-full max-w-3xl rounded-lg p-6 sm:p-10 text-slate-900 space-y-6"></div>
+          <div id="printablePdfArea" class="pdf-page-sheet w-full max-w-3xl rounded-xl p-6 sm:p-10 text-slate-900 space-y-6"></div>
         </div>
 
-        <!-- Sidebar Detail & Riwayat Revisi Dokumen -->
         <div class="lg:col-span-4 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 h-full overflow-y-auto p-4 sm:p-5 space-y-5 custom-scrollbar">
           <div class="flex items-center justify-between">
-            <h4 class="text-sm font-bold text-slate-900">Informasi &amp; Metadata Dokumen</h4>
-            <button type="button" id="viewerUpdateVersionBtn" onclick="openUpdateFromViewer()" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold border border-emerald-200 transition">
+            <h4 class="text-sm font-bold text-slate-800">Informasi &amp; Metadata Dokumen</h4>
+            <button type="button" id="viewerUpdateVersionBtn" onclick="openUpdateFromViewer()" class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#3B66F5] text-xs font-semibold border border-blue-200 transition">
               + Unggah Versi Baru
             </button>
           </div>
 
           <div id="viewerMetadataList" class="space-y-2.5 text-xs"></div>
 
-          <div class="pt-4 border-t border-slate-200">
-            <h4 class="text-sm font-bold text-slate-900 mb-3 flex items-center justify-between">
+          <div class="pt-4 border-t border-slate-100">
+            <h4 class="text-sm font-bold text-slate-800 mb-3 flex items-center justify-between">
               <span>Riwayat Pembaruan Dokumen</span>
               <span id="viewerHistoryCount" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">1 Versi</span>
             </h4>
@@ -574,17 +693,15 @@
   <!-- ===================================================================== -->
   <!-- MODAL 2: UPLOAD FILE PDF & DETEKSI PINTAR DUPLIKASI / KEMIRIPAN       -->
   <!-- ===================================================================== -->
-  <div id="uploadModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+  <div id="uploadModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
       <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
         <div>
-          <span id="uploadModalModeBadge" class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Unggah Dokumen Baru</span>
-          <h3 id="uploadModalTitle" class="text-base sm:text-lg font-bold mt-0.5">Unggah Dokumen PDF ke Arsip SMP DAFI</h3>
+          <span id="uploadModalModeBadge" class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">Unggah Dokumen Baru</span>
+          <h3 id="uploadModalTitle" class="text-base sm:text-lg font-bold mt-0.5">Upload File PDF ke DDMS SMP DAFI</h3>
         </div>
-        <button type="button" onclick="closeUploadModal()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+        <button type="button" onclick="closeUploadModal()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300">
+          [X]
         </button>
       </div>
 
@@ -592,9 +709,8 @@
         <input type="hidden" id="formMode" value="new">
         <input type="hidden" id="formTargetDocId" value="">
 
-        <!-- Pilihan Mode: Dokumen Baru vs Perbarui Versi -->
         <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">
-          <button type="button" id="modeBtnNew" onclick="switchUploadFormMode('new')" class="py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-sm transition">
+          <button type="button" id="modeBtnNew" onclick="switchUploadFormMode('new')" class="py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-xs transition">
             1. Unggah Dokumen Baru
           </button>
           <button type="button" id="modeBtnUpdate" onclick="switchUploadFormMode('update')" class="py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition">
@@ -602,48 +718,40 @@
           </button>
         </div>
 
-        <!-- Dropdown Pilih Dokumen (Hanya muncul saat mode Perbarui Versi) -->
         <div id="existingDocSelectWrapper" class="hidden p-3.5 rounded-xl bg-blue-50 border border-blue-200 space-y-2">
           <label for="formSelectExistingDoc" class="block text-xs font-bold text-blue-900">Pilih Dokumen yang Akan Diperbarui Versinya:</label>
           <select id="formSelectExistingDoc" onchange="populateFormForVersionUpdate()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border border-blue-300 bg-white outline-none"></select>
         </div>
 
-        <!-- Kotak Peringatan Pintar Deteksi Duplikasi / Dokumen Sudah Ada -->
         <div id="smartDuplicateAlert" class="hidden p-4 rounded-xl bg-amber-50 border border-amber-300 text-xs space-y-2"></div>
 
-        <!-- Dropzone File PDF -->
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1.5">File Dokumen PDF <span class="text-emerald-600">(Maks. 15 MB • Otomatis dikirim ke Google Drive via GAS)</span></label>
-          <label for="formPdfFile" class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl p-4 cursor-pointer bg-slate-50 hover:bg-emerald-50/40 transition text-center">
-            <svg class="w-8 h-8 text-emerald-600 mb-1.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-            </svg>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">File Dokumen PDF <span class="text-[#3B66F5]">(Maks. 15 MB • Otomatis dikirim ke Google Drive via GAS)</span></label>
+          <label for="formPdfFile" class="dropzone-dashed flex flex-col items-center justify-center p-4 cursor-pointer text-center">
             <span id="selectedFileNameDisplay" class="text-xs sm:text-sm font-semibold text-slate-700">Klik untuk memilih file .PDF dari perangkat Anda</span>
-            <span id="selectedFileSizeDisplay" class="text-xs text-slate-500 mt-0.5">Mendukung pratinjau langsung di aplikasi &amp; konversi Base64 ke Google Drive</span>
+            <span id="selectedFileSizeDisplay" class="text-xs text-slate-400 mt-0.5">Mendukung pratinjau langsung di aplikasi &amp; konversi Base64 ke Google Drive</span>
             <input type="file" id="formPdfFile" accept="application/pdf,.pdf" onchange="handlePdfFileSelected(event)" class="hidden">
           </label>
         </div>
 
-        <!-- Judul & Nomor Dokumen -->
         <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
           <div class="sm:col-span-7">
             <label for="formJudul" class="block text-xs font-semibold text-slate-700 mb-1">Judul Dokumen Resmi *</label>
-            <input type="text" id="formJudul" required oninput="checkUploadSimilarityLive()" placeholder="Contoh: SOP Pelaksanaan Supervisi Akademik Guru SMP DAFI" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 outline-none">
+            <input type="text" id="formJudul" required oninput="checkUploadSimilarityLive()" placeholder="Contoh: SOP Pelaksanaan Supervisi Akademik Guru SMP DAFI" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
           </div>
           <div class="sm:col-span-5">
             <div class="flex items-center justify-between mb-1">
               <label for="formNomor" class="block text-xs font-semibold text-slate-700">Nomor Dokumen / SK *</label>
-              <button type="button" onclick="autoGenerateDocNumber()" class="text-[11px] font-semibold text-emerald-600 hover:underline">Buat Otomatis</button>
+              <button type="button" onclick="autoGenerateDocNumber()" class="text-[11px] font-semibold text-[#3B66F5] hover:underline">Buat Otomatis</button>
             </div>
-            <input type="text" id="formNomor" required oninput="checkUploadSimilarityLive()" placeholder="021/SOP/SMP-DAFI/X/2026" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 outline-none font-mono">
+            <input type="text" id="formNomor" required oninput="checkUploadSimilarityLive()" placeholder="021/SOP/SMP-DAFI/X/2026" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none font-mono-code">
           </div>
         </div>
 
-        <!-- Kategori, Pembuat, Hak Akses & Versi -->
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div>
             <label for="formKategori" class="block text-xs font-semibold text-slate-700 mb-1">Kategori *</label>
-            <select id="formKategori" onchange="checkUploadSimilarityLive()" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 bg-white outline-none">
+            <select id="formKategori" onchange="checkUploadSimilarityLive()" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white outline-none">
               <option value="Tata Tertib">Tata Tertib</option>
               <option value="SOP">SOP</option>
               <option value="SK">SK (Surat Keputusan)</option>
@@ -653,7 +761,7 @@
 
           <div>
             <label for="formPembuat" class="block text-xs font-semibold text-slate-700 mb-1">Pembuat / Unit *</label>
-            <select id="formPembuat" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 bg-white outline-none">
+            <select id="formPembuat" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white outline-none">
               <option value="Kepala Sekolah">Kepala Sekolah</option>
               <option value="Waka Kurikulum">Waka Kurikulum</option>
               <option value="Waka Kesiswaan">Waka Kesiswaan</option>
@@ -664,7 +772,7 @@
 
           <div>
             <label for="formAkses" class="block text-xs font-semibold text-slate-700 mb-1">Hak Akses *</label>
-            <select id="formAkses" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 bg-white outline-none">
+            <select id="formAkses" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white outline-none">
               <option value="Publik">Publik (Semua Orang)</option>
               <option value="Internal Pendidik">Internal Pendidik (Login)</option>
             </select>
@@ -672,36 +780,33 @@
 
           <div>
             <label for="formVersi" class="block text-xs font-semibold text-slate-700 mb-1">Versi Dokumen *</label>
-            <input type="text" id="formVersi" value="v1.0" required class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 outline-none font-mono">
+            <input type="text" id="formVersi" value="v1.0" required class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none font-mono-code">
           </div>
         </div>
 
-        <!-- Kata Kunci / Tags -->
         <div>
           <div class="flex items-center justify-between mb-1">
             <label for="formKataKunci" class="block text-xs font-semibold text-slate-700">Kata Kunci Pencarian (Pisahkan dengan koma) *</label>
-            <button type="button" onclick="autoSuggestKeywords()" class="text-[11px] font-semibold text-emerald-600 hover:underline">Saran Kata Kunci Pintar</button>
+            <button type="button" onclick="autoSuggestKeywords()" class="text-[11px] font-semibold text-[#3B66F5] hover:underline">Saran Kata Kunci Pintar</button>
           </div>
-          <input type="text" id="formKataKunci" required placeholder="supervisi, akademik, kurikulum, guru, evaluasi" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 outline-none">
+          <input type="text" id="formKataKunci" required placeholder="supervisi, akademik, kurikulum, guru, evaluasi" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
         </div>
 
-        <!-- Ringkasan / Isi Pokok Dokumen -->
         <div>
           <label for="formRingkasan" class="block text-xs font-semibold text-slate-700 mb-1">Ringkasan Pokok / Isi Dokumen *</label>
-          <textarea id="formRingkasan" rows="3" required placeholder="Tuliskan ringkasan singkat atau poin-poin utama isi dokumen PDF ini agar mudah ditemukan oleh Kepala Sekolah dan Guru..." class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 outline-none"></textarea>
+          <textarea id="formRingkasan" rows="3" required placeholder="Tuliskan ringkasan singkat atau poin-poin utama isi dokumen PDF ini..." class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none"></textarea>
         </div>
 
-        <!-- Catatan Perubahan Versi (Changelog) -->
         <div>
           <label for="formCatatanRevisi" class="block text-xs font-semibold text-slate-700 mb-1">Catatan Riwayat Pembaruan (Changelog) *</label>
-          <input type="text" id="formCatatanRevisi" required value="Unggahan dokumen resmi awal (rilis pertama)." placeholder="Contoh: Penyesuaian jam kerja guru pada Pasal 4 sesuai rapat awal semester" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 outline-none">
+          <input type="text" id="formCatatanRevisi" required value="Unggahan dokumen resmi awal (rilis pertama)." class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
         </div>
 
-        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
-          <button type="button" onclick="closeUploadModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50">
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeUploadModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-50">
             Batal
           </button>
-          <button type="submit" id="submitUploadBtn" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs sm:text-sm font-semibold text-white shadow-sm transition">
+          <button type="submit" id="submitUploadBtn" class="px-5 py-2 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-xs sm:text-sm font-semibold text-white shadow-sm transition">
             Simpan &amp; Publikasikan PDF
           </button>
         </div>
@@ -710,19 +815,17 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- MODAL 3: LOGIN MULTI-PERAN (KEPSEK, GURU, ADMIN TU)                   -->
+  <!-- MODAL 3: LOGIN MULTI-PERAN                                            -->
   <!-- ===================================================================== -->
-  <div id="loginModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+  <div id="loginModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200">
-      <div class="bg-gradient-to-r from-emerald-800 to-teal-900 p-5 text-white flex items-center justify-between">
+      <div class="bg-[#3B66F5] p-5 text-white flex items-center justify-between">
         <div>
-          <span class="text-xs font-semibold uppercase tracking-wider text-emerald-300">Autentikasi DDMS</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-blue-100">Autentikasi DDMS</span>
           <h3 class="text-lg font-bold">Login Tenaga Pendidik SMP DAFI</h3>
         </div>
         <button type="button" onclick="closeLoginModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+          ✕
         </button>
       </div>
 
@@ -731,40 +834,39 @@
           Silakan masuk untuk mengakses dokumen berstatus <strong>Internal Pendidik</strong> serta melakukan <strong>Unggah / Pembaruan Versi PDF</strong>.
         </p>
 
-        <!-- Pintasan Demo Sekali Klik -->
         <div class="space-y-1.5">
-          <span class="block text-xs font-semibold text-slate-500">Pilih Akun Cepat (Klik untuk isi otomatis):</span>
+          <span class="block text-xs font-semibold text-slate-400">Pilih Akun Cepat (Klik untuk isi otomatis):</span>
           <div class="grid grid-cols-3 gap-2">
-            <button type="button" onclick="fillDemoCredentials('kepsek', 'dafi2026')" class="p-2 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition">
-              <div class="text-xs font-bold text-slate-900">Kepala Sekolah</div>
-              <div class="text-[11px] text-slate-500">Akses Penuh</div>
+            <button type="button" onclick="fillDemoCredentials('kepsek', 'dafi2026')" class="p-2.5 rounded-xl border border-slate-200 hover:border-[#3B66F5] hover:bg-blue-50/50 text-left transition">
+              <div class="text-xs font-bold text-slate-800">Kepala Sekolah</div>
+              <div class="text-[11px] text-[#3B66F5]">Akses Penuh</div>
             </button>
-            <button type="button" onclick="fillDemoCredentials('guru', 'guru2026')" class="p-2 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition">
-              <div class="text-xs font-bold text-slate-900">Guru / Pendidik</div>
-              <div class="text-[11px] text-slate-500">Baca &amp; Upload</div>
+            <button type="button" onclick="fillDemoCredentials('guru', 'guru2026')" class="p-2.5 rounded-xl border border-slate-200 hover:border-[#3B66F5] hover:bg-blue-50/50 text-left transition">
+              <div class="text-xs font-bold text-slate-800">Guru / Pendidik</div>
+              <div class="text-[11px] text-[#3B66F5]">Baca &amp; Upload</div>
             </button>
-            <button type="button" onclick="fillDemoCredentials('admin', 'admin2026')" class="p-2 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition">
-              <div class="text-xs font-bold text-slate-900">Admin TU</div>
-              <div class="text-[11px] text-slate-500">Kelola Arsip</div>
+            <button type="button" onclick="fillDemoCredentials('admin', 'admin2026')" class="p-2.5 rounded-xl border border-slate-200 hover:border-[#3B66F5] hover:bg-blue-50/50 text-left transition">
+              <div class="text-xs font-bold text-slate-800">Admin TU</div>
+              <div class="text-[11px] text-[#3B66F5]">Kelola Arsip</div>
             </button>
           </div>
         </div>
 
         <div>
           <label for="loginUsername" class="block text-xs font-semibold text-slate-700 mb-1">Username</label>
-          <input type="text" id="loginUsername" required placeholder="kepsek / guru / admin" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 outline-none">
+          <input type="text" id="loginUsername" required placeholder="kepsek / guru / admin" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
         </div>
 
         <div>
           <label for="loginPassword" class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi</label>
-          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-emerald-600 outline-none">
+          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
         </div>
 
         <div id="loginErrorBox" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium"></div>
 
         <div class="flex items-center justify-end gap-2 pt-2">
-          <button type="button" onclick="closeLoginModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700">Batal</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold text-white shadow-sm">Masuk Sekarang</button>
+          <button type="button" onclick="closeLoginModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-xs font-semibold text-white shadow-sm">Masuk Sekarang</button>
         </div>
       </form>
     </div>
@@ -773,25 +875,21 @@
   <!-- ===================================================================== -->
   <!-- MODAL 4: TAMBAH TARGET DOKUMEN STANDAR BARU                           -->
   <!-- ===================================================================== -->
-  <div id="addStandardModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+  <div id="addStandardModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200">
       <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
         <h3 class="text-base font-bold">Tambah Target Dokumen Wajib Sekolah</h3>
-        <button type="button" onclick="closeAddStandardModal()" class="p-1 rounded-lg bg-slate-800 text-slate-300">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
+        <button type="button" onclick="closeAddStandardModal()" class="p-1 rounded-lg bg-slate-800 text-slate-300">✕</button>
       </div>
       <form onsubmit="handleAddStandardSubmit(event)" class="p-5 space-y-3.5">
         <div>
           <label for="stdJudul" class="block text-xs font-semibold text-slate-700 mb-1">Judul Dokumen yang Perlu Disiapkan *</label>
-          <input type="text" id="stdJudul" required placeholder="Contoh: SOP Penanganan Kesehatan & UKS Santri/Siswa" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 outline-none">
+          <input type="text" id="stdJudul" required placeholder="Contoh: SOP Penanganan Kesehatan & UKS Siswa" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label for="stdKategori" class="block text-xs font-semibold text-slate-700 mb-1">Kategori *</label>
-            <select id="stdKategori" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 bg-white outline-none">
+            <select id="stdKategori" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white outline-none">
               <option value="Tata Tertib">Tata Tertib</option>
               <option value="SOP">SOP</option>
               <option value="SK">SK</option>
@@ -800,7 +898,7 @@
           </div>
           <div>
             <label for="stdPembuat" class="block text-xs font-semibold text-slate-700 mb-1">Unit Penanggung Jawab *</label>
-            <select id="stdPembuat" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 bg-white outline-none">
+            <select id="stdPembuat" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white outline-none">
               <option value="Kepala Sekolah">Kepala Sekolah</option>
               <option value="Waka Kurikulum">Waka Kurikulum</option>
               <option value="Waka Kesiswaan">Waka Kesiswaan</option>
@@ -811,27 +909,24 @@
         </div>
         <div>
           <label for="stdAlasan" class="block text-xs font-semibold text-slate-700 mb-1">Alasan / Kebutuhan Administratif *</label>
-          <input type="text" id="stdAlasan" required placeholder="Contoh: Diperlukan untuk akreditasi & pedoman layanan kesehatan siswa" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 outline-none">
+          <input type="text" id="stdAlasan" required placeholder="Contoh: Diperlukan untuk akreditasi & pedoman layanan kesehatan siswa" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 outline-none">
         </div>
         <div>
           <label for="stdKataKunci" class="block text-xs font-semibold text-slate-700 mb-1">Kata Kunci Deteksi (koma) *</label>
-          <input type="text" id="stdKataKunci" required placeholder="uks, kesehatan, penanganan siswa sakit" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 outline-none">
+          <input type="text" id="stdKataKunci" required placeholder="uks, kesehatan, penanganan siswa sakit" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 outline-none">
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeAddStandardModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700">Batal</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold text-white">Tambahkan ke Daftar Saran</button>
+          <button type="button" onclick="closeAddStandardModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">Batal</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-xs font-semibold text-white">Tambahkan ke Daftar Saran</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- ===================================================================== -->
-  <!-- JAVASCRIPT UTAMA APLIKASI SIMDOK SMP DAFI                             -->
+  <!-- JAVASCRIPT UTAMA DDMS - DAFI DOCUMENT MANAGEMENT SYSTEM               -->
   <!-- ===================================================================== -->
   <script>
-    // -----------------------------------------------------------------------
-    // 1. DATA AWAL & STANDAR DOKUMEN WAJIB SMP DAFI
-    // -----------------------------------------------------------------------
     const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
     const STORAGE_KEY_STANDARDS = 'smp_dafi_simdok_standards_v1';
     const STORAGE_KEY_GAS_URL = 'smp_dafi_simdok_gas_url_v1';
@@ -1058,7 +1153,6 @@
       }
     ];
 
-    // Daftar Dokumen Standar Wajib Sekolah untuk Analisis Pintar (Smart Gap Analysis)
     const INITIAL_STANDARD_DOCS = [
       {
         id: 'STD-01',
@@ -1152,7 +1246,6 @@
       }
     ];
 
-    // Kode Backend GAS lengkap untuk ditampilkan di Tab Integrasi GAS
     const EMBEDDED_GAS_CODE = `/**
  * BACKEND GOOGLE APPS SCRIPT (Code.gs) - DDMS (DAFI Document Management System) SMP DAFI
  * Mendukung GitHub Pages (CORS-Safe), Google Sheets Database & Google Drive PDF Storage
@@ -1269,15 +1362,13 @@ function jsonOut_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }`;
 
-    // -----------------------------------------------------------------------
-    // 2. STATE GLOBAL APLIKASI
-    // -----------------------------------------------------------------------
     let appState = {
       documents: [],
       standards: [],
-      currentUser: null, // null = Publik/Tamu, atau { username, namaLengkap, role, jabatan }
+      currentUser: null,
       activeTab: 'catalog',
       selectedCategory: 'ALL',
+      selectedDocId: 'DOC-2026-001',
       viewMode: 'grid',
       gasWebAppUrl: '',
       currentViewingDocId: null,
@@ -1289,16 +1380,12 @@ function jsonOut_(obj) {
       pendingUploadFileSize: ''
     };
 
-    // Daftar Akun Default
     const DEMO_USERS = [
       { username: 'kepsek', password: 'dafi2026', namaLengkap: 'Ustadz Kepala SMP DAFI', role: 'kepsek', jabatan: 'Kepala Sekolah' },
       { username: 'guru', password: 'guru2026', namaLengkap: 'Ustadz/Ustadzah Pendidik', role: 'guru', jabatan: 'Guru Mata Pelajaran' },
       { username: 'admin', password: 'admin2026', namaLengkap: 'Admin Tata Usaha DAFI', role: 'admin', jabatan: 'Kepala Tata Usaha' }
     ];
 
-    // -----------------------------------------------------------------------
-    // 3. SAFE LOCALSTORAGE HELPERS
-    // -----------------------------------------------------------------------
     function safeGetStorage(key, fallback) {
       try {
         const raw = localStorage.getItem(key);
@@ -1312,18 +1399,19 @@ function jsonOut_(obj) {
       try {
         localStorage.setItem(key, JSON.stringify(value));
       } catch (e) {
-        // Abaikan jika diblokir iframe
+        // Ignore storage restrictions
       }
     }
 
-    // -----------------------------------------------------------------------
-    // 4. INISIALISASI APLIKASI SAAT DIMUAT
-    // -----------------------------------------------------------------------
     function initApp() {
       appState.documents = safeGetStorage(STORAGE_KEY_DOCS, null) || JSON.parse(JSON.stringify(INITIAL_DOCUMENTS));
       appState.standards = safeGetStorage(STORAGE_KEY_STANDARDS, null) || JSON.parse(JSON.stringify(INITIAL_STANDARD_DOCS));
       appState.gasWebAppUrl = safeGetStorage(STORAGE_KEY_GAS_URL, '');
       appState.currentUser = safeGetStorage(STORAGE_KEY_USER, null);
+
+      if (appState.documents.length > 0 && !appState.selectedDocId) {
+        appState.selectedDocId = appState.documents[0].id;
+      }
 
       const gasInput = document.getElementById('gasUrlInput');
       if (gasInput) gasInput.value = appState.gasWebAppUrl;
@@ -1339,14 +1427,12 @@ function jsonOut_(obj) {
     function refreshAllViews() {
       updateMetricsAndCounters();
       renderCatalog();
+      renderSidebarQueueAndShare();
       renderSmartAssistant();
       populateHistoryFilterDropdown();
       renderGlobalHistory();
     }
 
-    // -----------------------------------------------------------------------
-    // 5. SISTEM NOTIFIKASI TOAST (TANPA ALERT/CONFIRM BROWSER)
-    // -----------------------------------------------------------------------
     function showToast(message, type) {
       const container = document.getElementById('toastContainer');
       if (!container) return;
@@ -1358,7 +1444,7 @@ function jsonOut_(obj) {
         : 'bg-slate-900 text-white';
 
       const toast = document.createElement('div');
-      toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg border border-white/10 text-xs sm:text-sm font-medium flex items-center justify-between gap-3 transition-all duration-300 ${bgClass}`;
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs sm:text-sm font-medium flex items-center justify-between gap-3 ${bgClass}`;
       toast.innerHTML = `
         <span>${escapeHtml(message)}</span>
         <button type="button" class="opacity-75 hover:opacity-100 font-bold text-sm leading-none">&times;</button>
@@ -1370,7 +1456,7 @@ function jsonOut_(obj) {
       container.appendChild(toast);
       setTimeout(function() {
         if (toast.parentNode) toast.remove();
-      }, 4200);
+      }, 4000);
     }
 
     function escapeHtml(str) {
@@ -1382,9 +1468,6 @@ function jsonOut_(obj) {
         .replace(/'/g, '&#039;');
     }
 
-    // -----------------------------------------------------------------------
-    // 6. MANAJEMEN TAB UTAMA
-    // -----------------------------------------------------------------------
     function switchMainTab(tabName) {
       appState.activeTab = tabName;
       const tabs = ['catalog', 'smart', 'history', 'gas'];
@@ -1396,17 +1479,14 @@ function jsonOut_(obj) {
         }
         if (btn) {
           if (t === tabName) {
-            btn.className = 'px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-emerald-600 text-emerald-700 whitespace-nowrap flex items-center gap-2 transition';
+            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-[#3B66F5] shadow-xs whitespace-nowrap flex items-center gap-1.5 transition';
           } else {
-            btn.className = 'px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap flex items-center gap-2 transition';
+            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 whitespace-nowrap flex items-center gap-1.5 transition';
           }
         }
       });
     }
 
-    // -----------------------------------------------------------------------
-    // 7. AUTENTIKASI & HAK AKSES PENGGUNA
-    // -----------------------------------------------------------------------
     function updateAuthUI() {
       const authArea = document.getElementById('authHeaderArea');
       const roleBannerBadge = document.getElementById('roleBannerBadge');
@@ -1418,45 +1498,39 @@ function jsonOut_(obj) {
       if (appState.currentUser) {
         const u = appState.currentUser;
         authArea.innerHTML = `
-          <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
-            <div class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center">
+          <div class="flex items-center gap-2 bg-blue-50/80 border border-blue-200 px-2.5 py-1 rounded-xl">
+            <div class="w-6 h-6 rounded-full bg-[#3B66F5] text-white text-xs font-bold flex items-center justify-center">
               ${escapeHtml(u.namaLengkap.charAt(0))}
             </div>
             <div class="hidden sm:block text-left">
-              <div class="text-xs font-bold text-slate-900 leading-none">${escapeHtml(u.namaLengkap)}</div>
-              <div class="text-[10px] text-emerald-700 font-medium">${escapeHtml(u.jabatan)}</div>
+              <div class="text-xs font-bold text-slate-800 leading-none">${escapeHtml(u.namaLengkap)}</div>
+              <div class="text-[10px] text-[#3B66F5] font-semibold">${escapeHtml(u.jabatan)}</div>
             </div>
-            <button type="button" onclick="handleLogout()" class="ml-1 px-2 py-1 rounded-lg bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 text-xs font-semibold border border-slate-200 transition">
+            <button type="button" onclick="handleLogout()" class="ml-1 px-2 py-0.5 rounded-lg bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 text-[11px] font-semibold border border-slate-200 transition">
               Keluar
             </button>
           </div>
         `;
         if (roleBannerBadge) {
-          roleBannerBadge.textContent = 'Login Aktif: ' + u.jabatan;
-          roleBannerBadge.className = 'px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-400 text-slate-950';
+          roleBannerBadge.textContent = u.jabatan;
+          roleBannerBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#3B66F5] border border-blue-200';
         }
         if (roleBannerDesc) {
-          roleBannerDesc.innerHTML = `Selamat datang, <strong>${escapeHtml(u.namaLengkap)}</strong>. Anda memiliki akses penuh untuk membuka dokumen <strong>Internal Pendidik</strong>, mengunggah file PDF baru, serta memperbarui revisi dokumen SMP DAFI.`;
+          roleBannerDesc.textContent = 'Login aktif sebagai ' + u.namaLengkap;
         }
         if (bannerLoginBtn) {
-          bannerLoginBtn.textContent = 'Unggah Dokumen PDF';
+          bannerLoginBtn.textContent = 'Akun: ' + u.jabatan;
           bannerLoginBtn.setAttribute('onclick', 'handleOpenUploadModal()');
         }
       } else {
         authArea.innerHTML = `
-          <button type="button" onclick="openLoginModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-white transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-            </svg>
-            <span>Login</span>
+          <button type="button" onclick="openLoginModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+            Login
           </button>
         `;
         if (roleBannerBadge) {
           roleBannerBadge.textContent = 'Mode Pengunjung Publik';
-          roleBannerBadge.className = 'px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-400/30';
-        }
-        if (roleBannerDesc) {
-          roleBannerDesc.innerHTML = 'Anda sedang mengakses halaman dengan domain publik. Dokumen berlabel <strong>Publik</strong> dapat langsung dibaca di aplikasi, sedangkan dokumen <strong>Internal Pendidik</strong> dan fitur <strong>Unggah/Revisi PDF</strong> memerlukan login Guru, Kepala Sekolah, atau Admin TU.';
+          roleBannerBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600';
         }
         if (bannerLoginBtn) {
           bannerLoginBtn.textContent = 'Login Pendidik / Admin';
@@ -1500,7 +1574,7 @@ function jsonOut_(obj) {
 
       if (!found) {
         if (errBox) {
-          errBox.textContent = 'Username atau kata sandi tidak cocok. Gunakan tombol Akun Cepat di atas untuk mencoba.';
+          errBox.textContent = 'Username atau kata sandi tidak cocok. Klik salah satu tombol Akun Cepat di atas.';
           errBox.classList.remove('hidden');
         }
         return;
@@ -1516,7 +1590,8 @@ function jsonOut_(obj) {
       closeLoginModal();
       updateAuthUI();
       renderCatalog();
-      showToast('Berhasil masuk sebagai ' + found.namaLengkap + ' (' + found.jabatan + ')', 'success');
+      renderSidebarQueueAndShare();
+      showToast('Berhasil masuk sebagai ' + found.namaLengkap, 'success');
     }
 
     function handleLogout() {
@@ -1524,14 +1599,11 @@ function jsonOut_(obj) {
       safeSetStorage(STORAGE_KEY_USER, null);
       updateAuthUI();
       renderCatalog();
+      renderSidebarQueueAndShare();
       showToast('Anda telah keluar ke Mode Pengunjung Publik.', 'success');
     }
 
-    // -----------------------------------------------------------------------
-    // 8. PERHITUNGAN METRIK & ANALISIS PINTAR KELENGKAPAN DOKUMEN
-    // -----------------------------------------------------------------------
     function isStandardFulfilled(stdItem) {
-      // Cek apakah ada dokumen di appState.documents yang cocok dengan judul atau kata kunci standar
       return appState.documents.find(function(doc) {
         if (doc.kategori !== stdItem.kategori) return false;
         const docText = (doc.judul + ' ' + (doc.kataKunci || []).join(' ') + ' ' + doc.ringkasan).toLowerCase();
@@ -1546,12 +1618,11 @@ function jsonOut_(obj) {
       const total = appState.documents.length;
       const pubCount = appState.documents.filter(function(d) { return d.akses === 'Publik'; }).length;
       const intCount = total - pubCount;
-      const sopTatibCount = appState.documents.filter(function(d) {
-        return d.kategori === 'SOP' || d.kategori === 'Tata Tertib';
-      }).length;
-      const skSuratCount = appState.documents.filter(function(d) {
-        return d.kategori === 'SK' || d.kategori === 'Surat Administratif';
-      }).length;
+
+      const countTatib = appState.documents.filter(function(d) { return d.kategori === 'Tata Tertib'; }).length;
+      const countSop = appState.documents.filter(function(d) { return d.kategori === 'SOP'; }).length;
+      const countSk = appState.documents.filter(function(d) { return d.kategori === 'SK'; }).length;
+      const countSurat = appState.documents.filter(function(d) { return d.kategori === 'Surat Administratif'; }).length;
 
       let fulfilledCount = 0;
       appState.standards.forEach(function(std) {
@@ -1563,8 +1634,10 @@ function jsonOut_(obj) {
 
       const elTotal = document.getElementById('statTotalDocs');
       const elBreak = document.getElementById('statAccessBreakdown');
+      const elTatib = document.getElementById('folderCountTatib');
       const elSop = document.getElementById('statSopTatib');
       const elSk = document.getElementById('statSkSurat');
+      const elSurat = document.getElementById('folderCountSurat');
       const elPct = document.getElementById('statSmartCompleteness');
       const elSub = document.getElementById('statSmartSubtext');
       const navDocs = document.getElementById('navCountDocs');
@@ -1572,25 +1645,32 @@ function jsonOut_(obj) {
 
       if (elTotal) elTotal.textContent = total;
       if (elBreak) elBreak.textContent = `${pubCount} Publik • ${intCount} Internal Pendidik`;
-      if (elSop) elSop.textContent = sopTatibCount;
-      if (elSk) elSk.textContent = skSuratCount;
+      if (elTatib) elTatib.textContent = countTatib;
+      if (elSop) elSop.textContent = countSop;
+      if (elSk) elSk.textContent = countSk;
+      if (elSurat) elSurat.textContent = countSurat;
+      const fAll = document.getElementById('folderBtnAll');
+      const fTatib = document.getElementById('folderBtnTatib');
+      const fSop = document.getElementById('folderBtnSop');
+      const fSk = document.getElementById('folderBtnSk');
+      const fSurat = document.getElementById('folderBtnSurat');
+      if (fAll) fAll.setAttribute('data-files-label', `(${total}) Files`);
+      if (fTatib) fTatib.setAttribute('data-files-label', `(${countTatib}) Files`);
+      if (fSop) fSop.setAttribute('data-files-label', `(${countSop}) Files`);
+      if (fSk) fSk.setAttribute('data-files-label', `(${countSk}) Files`);
+      if (fSurat) fSurat.setAttribute('data-files-label', `(${countSurat}) Files`);
       if (elPct) elPct.textContent = pct + '%';
-      if (elSub) elSub.textContent = `${missingCount} dokumen standar disarankan`;
+      if (elSub) elSub.textContent = `${missingCount} saran dokumen`;
       if (navDocs) navDocs.textContent = total;
-      if (navSmart) navSmart.textContent = missingCount > 0 ? `${missingCount} Saran` : 'Lengkap';
+      if (navSmart) navSmart.textContent = missingCount > 0 ? `${missingCount} Perlu Ditambah` : 'Lengkap';
     }
 
-    // -----------------------------------------------------------------------
-    // 9. KATALOG DOKUMEN, PENCARIAN & FILTER MULTI-KRITERIA
-    // -----------------------------------------------------------------------
     function quickFilterCategory(category) {
       appState.selectedCategory = category;
       const pills = document.querySelectorAll('.cat-pill');
       pills.forEach(function(btn) {
         const isActive = btn.getAttribute('data-cat') === category;
-        btn.className = isActive
-          ? 'cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition'
-          : 'cat-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+        btn.classList.toggle('active-folder', isActive);
       });
       if (appState.activeTab !== 'catalog') {
         switchMainTab('catalog');
@@ -1604,11 +1684,11 @@ function jsonOut_(obj) {
       const btnTable = document.getElementById('viewBtnTable');
       if (btnGrid && btnTable) {
         btnGrid.className = mode === 'grid'
-          ? 'px-2.5 py-1 rounded-md text-xs font-medium bg-white text-slate-800 shadow-sm'
-          : 'px-2.5 py-1 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900';
+          ? 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs'
+          : 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800';
         btnTable.className = mode === 'table'
-          ? 'px-2.5 py-1 rounded-md text-xs font-medium bg-white text-slate-800 shadow-sm'
-          : 'px-2.5 py-1 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900';
+          ? 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs'
+          : 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800';
       }
       renderCatalog();
     }
@@ -1629,10 +1709,63 @@ function jsonOut_(obj) {
     }
 
     function getCategoryBadgeStyle(kategori) {
-      if (kategori === 'Tata Tertib') return 'bg-rose-50 text-rose-700 border-rose-200';
-      if (kategori === 'SOP') return 'bg-blue-50 text-blue-700 border-blue-200';
-      if (kategori === 'SK') return 'bg-purple-50 text-purple-700 border-purple-200';
-      return 'bg-teal-50 text-teal-700 border-teal-200';
+      if (kategori === 'Tata Tertib') return 'bg-red-50 text-red-600 border-red-200';
+      if (kategori === 'SOP') return 'bg-blue-50 text-[#3B66F5] border-blue-200';
+      if (kategori === 'SK') return 'bg-emerald-50 text-emerald-600 border-emerald-200';
+      return 'bg-orange-50 text-orange-600 border-orange-200';
+    }
+
+    // SVG Document Page Icon with Folded Ear & Colored Type Pill (Matches Reference Image)
+    function getFileDocumentSvg(kategori, sizeClass) {
+      let badgeColor = '#EF4444'; // Red for PDF / Tata Tertib
+      let badgeText = 'PDF';
+      if (kategori === 'SOP') {
+        badgeColor = '#3B66F5'; // Royal Blue like DOC in reference
+        badgeText = 'SOP';
+      } else if (kategori === 'SK') {
+        badgeColor = '#16A34A'; // Green like XLS in reference
+        badgeText = 'SK';
+      } else if (kategori === 'Surat Administratif') {
+        badgeColor = '#F97316'; // Orange like PPT in reference
+        badgeText = 'SRT';
+      }
+
+      const cls = sizeClass || 'w-14 h-16';
+      return `
+        <svg class="${cls} mx-auto" viewBox="0 0 56 64" fill="none">
+          <path d="M10 6C10 3.79086 11.7909 2 14 2H35.1716C36.2324 2 37.2499 2.42143 38 3.17157L46.8284 12C47.5786 12.7501 48 13.7676 48 14.8284V58C48 60.2091 46.2091 62 44 62H14C11.7909 62 10 60.2091 10 58V6Z" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2.2"/>
+          <path d="M35 2.5V11C35 12.6569 36.3431 14 38 14H47.5" stroke="#94A3B8" stroke-width="2.2" stroke-linecap="round"/>
+          <rect x="6" y="32" width="30" height="15" rx="3.5" fill="${badgeColor}"/>
+          <text x="21" y="42.5" text-anchor="middle" fill="#FFFFFF" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" font-weight="800">${badgeText}</text>
+        </svg>
+      `;
+    }
+
+    function selectDocumentTile(docId, openImmediately) {
+      appState.selectedDocId = docId;
+      renderCatalog();
+      renderSidebarQueueAndShare();
+      if (openImmediately) {
+        openPdfViewer(docId);
+      }
+    }
+
+    function openSelectedDocViewer() {
+      if (!appState.selectedDocId && appState.documents.length > 0) {
+        appState.selectedDocId = appState.documents[0].id;
+      }
+      if (appState.selectedDocId) {
+        openPdfViewer(appState.selectedDocId);
+      }
+    }
+
+    function openSelectedDocRevision() {
+      if (!appState.selectedDocId && appState.documents.length > 0) {
+        appState.selectedDocId = appState.documents[0].id;
+      }
+      if (appState.selectedDocId) {
+        openDirectUpdateVersion(appState.selectedDocId);
+      }
     }
 
     function renderCatalog() {
@@ -1690,19 +1823,14 @@ function jsonOut_(obj) {
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center space-y-3">
-            <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-base font-bold text-slate-900">Dokumen Tidak Ditemukan</h3>
-            <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-              Tidak ada dokumen yang cocok dengan pencarian Anda. Anda dapat mereset filter atau mengunggah dokumen tersebut sebagai arsip baru SMP DAFI.
+          <div class="rounded-2xl border border-dashed border-slate-200 p-10 text-center space-y-3">
+            <h3 class="text-base font-bold text-slate-700">Dokumen Tidak Ditemukan</h3>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">
+              Tidak ada berkas PDF yang cocok dengan kata kunci pencarian Anda.
             </p>
-            <div class="flex items-center justify-center gap-2 pt-2">
-              <button type="button" onclick="clearSearchAndFilters()" class="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50">Reset Filter</button>
-              <button type="button" onclick="prefillUploadFromSearch()" class="px-4 py-2 rounded-xl bg-emerald-600 text-xs font-semibold text-white hover:bg-emerald-700">+ Unggah Dokumen Ini</button>
+            <div class="flex items-center justify-center gap-2 pt-1">
+              <button type="button" onclick="clearSearchAndFilters()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">Reset Filter</button>
+              <button type="button" onclick="prefillUploadFromSearch()" class="px-4 py-2 rounded-xl bg-[#3B66F5] text-xs font-semibold text-white hover:bg-[#2952D9]">+ Unggah Dokumen Ini</button>
             </div>
           </div>
         `;
@@ -1716,86 +1844,57 @@ function jsonOut_(obj) {
       }
     }
 
+    // File Grid Styled Like the Reference UI Image (Clean Icon Tiles + Selected Blue Card Highlight)
     function renderGridCatalog(container, docs) {
-      const cardsHtml = docs.map(function(doc) {
+      const tilesHtml = docs.map(function(doc) {
+        const isSelected = appState.selectedDocId === doc.id;
         const isLocked = doc.akses === 'Internal Pendidik' && !appState.currentUser;
-        const catStyle = getCategoryBadgeStyle(doc.kategori);
-        const accessBadge = doc.akses === 'Internal Pendidik'
-          ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-               <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-               Internal Pendidik
-             </span>`
-          : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Publik</span>`;
-
-        const tagsHtml = (doc.kataKunci || []).slice(0, 4).map(function(tag) {
-          return `<button type="button" onclick="filterByTag('${escapeHtml(tag)}')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 text-[11px] transition">#${escapeHtml(tag)}</button>`;
-        }).join('');
-
         const revCount = doc.riwayat ? doc.riwayat.length : 1;
 
         return `
-          <article class="bg-white rounded-2xl border border-slate-200 hover:border-emerald-500/70 shadow-sm hover:shadow-md transition flex flex-col justify-between p-5">
-            <div class="space-y-3">
-              <!-- Baris Badge Atas -->
-              <div class="flex items-center justify-between gap-2 flex-wrap">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold border ${catStyle}">${escapeHtml(doc.kategori)}</span>
-                  ${accessBadge}
-                </div>
-                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono text-xs font-semibold">${escapeHtml(doc.versi)}</span>
+          <div onclick="selectDocumentTile('${escapeHtml(doc.id)}', false)" class="file-tile ${isSelected ? 'selected-file' : ''} p-4 flex flex-col items-center text-center justify-between cursor-pointer relative group">
+            <!-- Three Dots Menu on Selected or Hover (Matches Reference UI) -->
+            <button type="button" onclick="event.stopPropagation(); openDocHistoryJump('${escapeHtml(doc.id)}')" class="${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} absolute top-2.5 right-2.5 w-6 h-6 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition" title="Riwayat ${revCount} Versi">
+              ⋮
+            </button>
+
+            <div class="w-full space-y-2.5 pt-1">
+              <!-- Document Icon with Category Color Pill -->
+              <div onclick="event.stopPropagation(); openPdfViewer('${escapeHtml(doc.id)}')" class="transition-transform group-hover:scale-105">
+                ${getFileDocumentSvg(doc.kategori, 'w-14 h-16')}
               </div>
 
-              <!-- Nomor & Judul -->
-              <div>
-                <div class="text-[11px] font-mono text-slate-400">${escapeHtml(doc.nomorDokumen)}</div>
-                <h3 class="text-base font-bold text-slate-900 mt-0.5 leading-snug">${escapeHtml(doc.judul)}</h3>
-              </div>
-
-              <!-- Ringkasan -->
-              <p class="text-xs text-slate-600 line-clamp-3 leading-relaxed">
-                ${escapeHtml(doc.ringkasan)}
-              </p>
-
-              <!-- Kata Kunci -->
-              <div class="flex items-center gap-1.5 flex-wrap pt-1">
-                ${tagsHtml}
+              <!-- Title -->
+              <div class="px-1">
+                <h3 class="text-xs sm:text-[13px] font-semibold text-slate-700 line-clamp-2 leading-snug" title="${escapeHtml(doc.judul)}">
+                  ${escapeHtml(doc.judul)}
+                </h3>
+                <p class="text-[11px] text-slate-400 mt-1">
+                  ${escapeHtml(doc.tanggalUpdate)} • <span class="font-mono-code font-semibold text-slate-500">${escapeHtml(doc.versi)}</span>
+                </p>
               </div>
             </div>
 
-            <!-- Footer Kartu -->
-            <div class="pt-4 mt-4 border-t border-slate-100 space-y-3">
-              <div class="flex items-center justify-between text-[11px] text-slate-500">
-                <span>Oleh: <strong class="text-slate-700">${escapeHtml(doc.pembuat)}</strong></span>
-                <span>Update: <strong class="text-slate-700">${escapeHtml(doc.tanggalUpdate)}</strong> (${escapeHtml(doc.ukuran)})</span>
-              </div>
-
-              <div class="flex items-center gap-2">
-                ${isLocked ? `
-                  <button type="button" onclick="openLoginModal('Dokumen &quot;${escapeHtml(doc.judul)}&quot; berstatus Internal Pendidik. Silakan login sebagai Guru, Kepala Sekolah, atau Admin TU untuk membaca PDF ini.')" class="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold text-xs transition flex items-center justify-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    <span>Login untuk Baca PDF</span>
-                  </button>
-                ` : `
-                  <button type="button" onclick="openPdfViewer('${escapeHtml(doc.id)}')" class="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition flex items-center justify-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    <span>Baca PDF di Aplikasi</span>
-                  </button>
-                `}
-
-                <button type="button" onclick="openDocHistoryJump('${escapeHtml(doc.id)}')" class="py-2 px-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition" title="Lihat Riwayat Revisi">
-                  ${revCount} Versi
+            <!-- Action Pills (Visible on Selected or Hover) -->
+            <div class="w-full pt-3 mt-2 border-t border-slate-100/80 flex items-center justify-center gap-1.5">
+              ${isLocked ? `
+                <button type="button" onclick="event.stopPropagation(); openLoginModal('Dokumen &quot;${escapeHtml(doc.judul)}&quot; berstatus Internal Pendidik. Silakan login terlebih dahulu.')" class="w-full py-1.5 px-2.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold text-[11px] transition">
+                  🔒 Internal
                 </button>
-
-                <button type="button" onclick="openDirectUpdateVersion('${escapeHtml(doc.id)}')" class="py-2 px-2.5 rounded-xl border border-slate-200 hover:bg-emerald-50 hover:border-emerald-200 text-emerald-700 font-semibold text-xs transition" title="Unggah Revisi / Versi Baru">
-                  Revisi
+              ` : `
+                <button type="button" onclick="event.stopPropagation(); openPdfViewer('${escapeHtml(doc.id)}')" class="flex-1 py-1.5 px-2.5 rounded-lg ${isSelected ? 'bg-[#3B66F5] text-white' : 'bg-slate-100 hover:bg-[#3B66F5] text-slate-700 hover:text-white'} font-semibold text-[11px] transition">
+                  Baca PDF
                 </button>
-              </div>
+              `}
+              <button type="button" onclick="event.stopPropagation(); openDirectUpdateVersion('${escapeHtml(doc.id)}')" class="py-1.5 px-2 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-[#3B66F5] font-semibold text-[11px] transition" title="Unggah Revisi Baru">
+                ${revCount}v
+              </button>
             </div>
-          </article>
+          </div>
         `;
       }).join('');
 
-      container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">${cardsHtml}</div>`;
+      container.innerHTML = `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 pt-1">${tilesHtml}</div>`;
     }
 
     function renderTableCatalog(container, docs) {
@@ -1803,25 +1902,22 @@ function jsonOut_(obj) {
         const isLocked = doc.akses === 'Internal Pendidik' && !appState.currentUser;
         const catStyle = getCategoryBadgeStyle(doc.kategori);
         return `
-          <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
-            <td class="py-3.5 px-4">
-              <div class="font-bold text-slate-900 text-xs sm:text-sm">${escapeHtml(doc.judul)}</div>
-              <div class="text-[11px] font-mono text-slate-400">${escapeHtml(doc.nomorDokumen)}</div>
+          <tr onclick="selectDocumentTile('${escapeHtml(doc.id)}', false)" class="border-b border-slate-100 hover:bg-slate-50/80 transition cursor-pointer">
+            <td class="py-3 px-3">
+              <div class="font-semibold text-slate-800 text-xs sm:text-sm">${escapeHtml(doc.judul)}</div>
+              <div class="text-[11px] font-mono-code text-slate-400">${escapeHtml(doc.nomorDokumen)}</div>
             </td>
-            <td class="py-3.5 px-4">
-              <span class="px-2 py-0.5 rounded text-xs font-semibold border ${catStyle}">${escapeHtml(doc.kategori)}</span>
+            <td class="py-3 px-3">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${catStyle}">${escapeHtml(doc.kategori)}</span>
             </td>
-            <td class="py-3.5 px-4 text-xs text-slate-700">${escapeHtml(doc.pembuat)}</td>
-            <td class="py-3.5 px-4">
-              <span class="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100">${escapeHtml(doc.versi)}</span>
-            </td>
-            <td class="py-3.5 px-4 text-xs text-slate-600">${escapeHtml(doc.akses)}</td>
-            <td class="py-3.5 px-4 text-xs text-slate-500">${escapeHtml(doc.tanggalUpdate)}</td>
-            <td class="py-3.5 px-4 text-right">
+            <td class="py-3 px-3 text-xs text-slate-600">${escapeHtml(doc.pembuat)}</td>
+            <td class="py-3 px-3 font-mono-code text-xs font-semibold text-slate-700">${escapeHtml(doc.versi)}</td>
+            <td class="py-3 px-3 text-xs text-slate-500">${escapeHtml(doc.tanggalUpdate)}</td>
+            <td class="py-3 px-3 text-right">
               ${isLocked ? `
-                <button type="button" onclick="openLoginModal('Silakan login untuk membaca dokumen internal ini.')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-semibold text-xs">Login</button>
+                <button type="button" onclick="event.stopPropagation(); openLoginModal('Silakan login untuk membaca dokumen internal ini.')" class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs">Login</button>
               ` : `
-                <button type="button" onclick="openPdfViewer('${escapeHtml(doc.id)}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold text-xs hover:bg-emerald-700">Baca PDF</button>
+                <button type="button" onclick="event.stopPropagation(); openPdfViewer('${escapeHtml(doc.id)}')" class="px-3 py-1 rounded-lg bg-[#3B66F5] text-white font-semibold text-xs">Baca PDF</button>
               `}
             </td>
           </tr>
@@ -1829,17 +1925,16 @@ function jsonOut_(obj) {
       }).join('');
 
       container.innerHTML = `
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
+        <div class="rounded-xl border border-slate-200/80 overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase text-slate-500">
-                <th class="py-3 px-4">Judul &amp; Nomor Dokumen</th>
-                <th class="py-3 px-4">Kategori</th>
-                <th class="py-3 px-4">Pembuat</th>
-                <th class="py-3 px-4">Versi</th>
-                <th class="py-3 px-4">Akses</th>
-                <th class="py-3 px-4">Diperbarui</th>
-                <th class="py-3 px-4 text-right">Aksi</th>
+              <tr class="bg-slate-50 border-b border-slate-200/80 text-[11px] font-bold uppercase text-slate-400">
+                <th class="py-2.5 px-3">Dokumen</th>
+                <th class="py-2.5 px-3">Kategori</th>
+                <th class="py-2.5 px-3">Pembuat</th>
+                <th class="py-2.5 px-3">Versi</th>
+                <th class="py-2.5 px-3">Tanggal</th>
+                <th class="py-2.5 px-3 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody>${rowsHtml}</tbody>
@@ -1849,7 +1944,146 @@ function jsonOut_(obj) {
     }
 
     // -----------------------------------------------------------------------
-    // 10. IN-APP PDF READER & RIWAYAT VERSI DOKUMEN
+    // RIGHT SIDEBAR RENDERER: UPLOAD QUEUE + SHARE CARD (MATCHES IMAGE)
+    // -----------------------------------------------------------------------
+    function renderSidebarQueueAndShare() {
+      const queueEl = document.getElementById('sidebarUploadQueue');
+      const shareTitleEl = document.getElementById('shareCardDocTitle');
+      const shareAccessSelect = document.getElementById('shareAccessQuickSelect');
+      const sharePeopleEl = document.getElementById('sharePeopleList');
+
+      const recentDocs = appState.documents.slice(0, 3);
+      if (queueEl) {
+        queueEl.innerHTML = recentDocs.map(function(doc, idx) {
+          if (idx === 0) {
+            return `
+              <div onclick="openPdfViewer('${escapeHtml(doc.id)}')" class="p-3 rounded-xl bg-[#F2F6FF] border border-[#DCE6FF] cursor-pointer transition hover:shadow-xs space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-9 shrink-0 flex items-center justify-center">
+                      ${getFileDocumentSvg(doc.kategori, 'w-7 h-8')}
+                    </div>
+                    <div class="min-w-0">
+                      <div class="text-xs font-semibold text-slate-700 truncate">${escapeHtml(doc.judul)}.pdf</div>
+                      <div class="text-[10px] text-slate-400">${escapeHtml(doc.ukuran)} • ${escapeHtml(doc.versi)}</div>
+                    </div>
+                  </div>
+                  <span class="text-[11px] font-bold text-[#3B66F5] shrink-0">100%</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-blue-100 overflow-hidden">
+                  <div class="h-full bg-[#3B66F5] rounded-full" style="width: 100%"></div>
+                </div>
+              </div>
+            `;
+          }
+          return `
+            <div onclick="openPdfViewer('${escapeHtml(doc.id)}')" class="p-2.5 rounded-xl bg-white border border-slate-200/80 hover:border-blue-300 cursor-pointer flex items-center justify-between gap-2 transition">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-9 shrink-0 flex items-center justify-center">
+                  ${getFileDocumentSvg(doc.kategori, 'w-7 h-8')}
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-semibold text-slate-700 truncate">${escapeHtml(doc.judul)}.pdf</div>
+                  <div class="text-[10px] text-slate-400">${escapeHtml(doc.ukuran)} • ${escapeHtml(doc.tanggalUpdate)}</div>
+                </div>
+              </div>
+              <button type="button" onclick="event.stopPropagation(); openDirectUpdateVersion('${escapeHtml(doc.id)}')" class="p-1.5 text-slate-400 hover:text-[#3B66F5] transition" title="Perbarui Versi">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const selectedDoc = appState.documents.find(function(d) { return d.id === appState.selectedDocId; }) || appState.documents[0];
+      if (!selectedDoc) return;
+
+      if (shareTitleEl) {
+        const shortName = selectedDoc.judul.length > 28 ? selectedDoc.judul.slice(0, 28) + '...' : selectedDoc.judul;
+        shareTitleEl.textContent = shortName + '.pdf';
+      }
+
+      if (shareAccessSelect) {
+        shareAccessSelect.value = selectedDoc.akses;
+      }
+
+      if (sharePeopleEl) {
+        const people = [
+          { initials: 'KS', bg: 'bg-[#E59843]', name: 'Kepala SMP DAFI', email: 'kepsek@smpdafi.sch.id', roleLabel: 'file owner', isOwner: true },
+          { initials: 'WK', bg: 'bg-[#3C7A5B]', name: 'Waka Kurikulum & Kesiswaan', email: 'kurikulum@smpdafi.sch.id', roleLabel: 'can edit ▾', isOwner: false },
+          { initials: 'GR', bg: 'bg-[#4F6BED]', name: 'Dewan Guru & Wali Kelas', email: 'guru@smpdafi.sch.id', roleLabel: selectedDoc.akses === 'Publik' ? 'can view ▾' : 'internal login ▾', isOwner: false }
+        ];
+
+        sharePeopleEl.innerHTML = people.map(function(p) {
+          return `
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-full ${p.bg} text-white text-xs font-bold flex items-center justify-center shrink-0">
+                  ${p.initials}
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-bold text-slate-700 truncate">${p.name}</div>
+                  <div class="text-[11px] text-slate-400 truncate">${p.email}</div>
+                </div>
+              </div>
+              ${p.isOwner ? `
+                <span class="px-2.5 py-1 rounded-md bg-blue-50 text-[#3B66F5] text-[11px] font-semibold shrink-0">file owner</span>
+              ` : `
+                <button type="button" onclick="handleQuickAccessChange()" class="text-[11px] font-medium text-slate-500 hover:text-[#3B66F5] shrink-0">${p.roleLabel}</button>
+              `}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function handleQuickSidebarAction() {
+      const input = document.getElementById('quickSidebarCheckInput');
+      const val = (input ? input.value : '').trim();
+      if (!val) {
+        handleOpenUploadModal();
+        return;
+      }
+      if (val.indexOf('script.google.com') !== -1) {
+        appState.gasWebAppUrl = val;
+        safeSetStorage(STORAGE_KEY_GAS_URL, val);
+        const gasUrlInput = document.getElementById('gasUrlInput');
+        if (gasUrlInput) gasUrlInput.value = val;
+        updateGasStatusBadge();
+        showToast('URL Endpoint GAS berhasil disimpan!', 'success');
+        return;
+      }
+      // Jika bukan URL GAS, buka modal upload dengan prefill judul
+      handleOpenUploadModal({
+        judul: val,
+        kategori: 'SOP',
+        pembuat: 'Kepala Sekolah',
+        kataKunci: [val.toLowerCase()],
+        alasan: ''
+      });
+    }
+
+    function handleQuickAccessChange() {
+      const sel = document.getElementById('shareAccessQuickSelect');
+      const selectedDoc = appState.documents.find(function(d) { return d.id === appState.selectedDocId; });
+      if (!selectedDoc || !sel) return;
+
+      if (!appState.currentUser) {
+        openLoginModal('Silakan login terlebih dahulu untuk mengubah hak akses dokumen "' + selectedDoc.judul + '".');
+        sel.value = selectedDoc.akses;
+        return;
+      }
+
+      selectedDoc.akses = sel.value;
+      safeSetStorage(STORAGE_KEY_DOCS, appState.documents);
+      refreshAllViews();
+      showToast(`Hak akses "${selectedDoc.judul}" diubah menjadi ${selectedDoc.akses}.`, 'success');
+    }
+
+    // -----------------------------------------------------------------------
+    // IN-APP PDF READER & RIWAYAT VERSI
     // -----------------------------------------------------------------------
     function openPdfViewer(docId, versionIdx) {
       const doc = appState.documents.find(function(d) { return d.id === docId; });
@@ -1860,6 +2094,7 @@ function jsonOut_(obj) {
         return;
       }
 
+      appState.selectedDocId = docId;
       appState.currentViewingDocId = docId;
       const historyList = doc.riwayat && doc.riwayat.length > 0 ? doc.riwayat : [
         { versi: doc.versi, tanggalUpdate: doc.tanggalUpdate, diperbaruiOleh: doc.pembuat, catatanPerubahan: 'Rilis dokumen.', ukuran: doc.ukuran }
@@ -1868,6 +2103,7 @@ function jsonOut_(obj) {
       appState.pdfZoom = 1.0;
 
       renderPdfViewerContent();
+      renderSidebarQueueAndShare();
       document.getElementById('pdfViewerModal').classList.remove('hidden');
     }
 
@@ -1913,7 +2149,6 @@ function jsonOut_(obj) {
       document.getElementById('viewerDocSubtitle').textContent = `${doc.nomorDokumen} • Oleh: ${doc.pembuat} • Akses: ${doc.akses}`;
       document.getElementById('pdfZoomLabel').textContent = Math.round(appState.pdfZoom * 100) + '%';
 
-      // Populate dropdown versi
       const verSelect = document.getElementById('viewerVersionSelect');
       verSelect.innerHTML = historyList.map(function(v, idx) {
         const tag = idx === historyList.length - 1 ? ' (Terbaru)' : ' (Arsip)';
@@ -1921,7 +2156,6 @@ function jsonOut_(obj) {
         return `<option value="${idx}" ${selected}>${escapeHtml(v.versi)}${tag} - ${escapeHtml(v.tanggalUpdate)}</option>`;
       }).join('');
 
-      // Cek apakah ada file PDF asli (Blob URL dari upload lokal atau Google Drive URL)
       const nativeIframe = document.getElementById('nativePdfIframe');
       const printableArea = document.getElementById('printablePdfArea');
       const extNotice = document.getElementById('externalPdfNotice');
@@ -1939,7 +2173,6 @@ function jsonOut_(obj) {
         nativeIframe.classList.add('hidden');
       }
 
-      // Render Lembar Dokumen Resmi SMP DAFI
       const pasalList = (doc.isiPasal && doc.isiPasal.length > 0)
         ? doc.isiPasal
         : [
@@ -1950,142 +2183,134 @@ function jsonOut_(obj) {
 
       const pasalHtml = pasalList.map(function(p, i) {
         return `
-          <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs sm:text-sm leading-relaxed text-slate-800">
-            <span class="font-bold text-emerald-800">Butir ${i + 1}:</span> ${escapeHtml(p)}
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm leading-relaxed text-slate-800">
+            <span class="font-bold text-[#3B66F5]">Butir ${i + 1}:</span> ${escapeHtml(p)}
           </div>
         `;
       }).join('');
 
       printableArea.style.transform = `scale(${appState.pdfZoom})`;
       printableArea.innerHTML = `
-        <!-- Kop Surat Resmi SMP DAFI -->
-        <div class="border-b-4 border-double border-emerald-800 pb-4 flex items-center justify-between gap-4">
+        <div class="border-b-4 border-double border-slate-800 pb-4 flex items-center justify-between gap-4">
           <div class="flex items-center gap-3.5">
-            <div class="w-14 h-14 rounded-xl bg-emerald-800 text-white flex items-center justify-center font-bold text-lg shrink-0">
+            <div class="w-14 h-14 rounded-xl bg-[#3B66F5] text-white flex items-center justify-center font-extrabold text-lg shrink-0">
               DAFI
             </div>
             <div>
-              <div class="text-xs font-bold uppercase tracking-widest text-emerald-700">Yayasan Pondok Pesantren Darul Fikri</div>
+              <div class="text-xs font-bold uppercase tracking-widest text-[#3B66F5]">Yayasan Pondok Pesantren Darul Fikri</div>
               <div class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">SEKOLAH MENENGAH PERTAMA (SMP) DAFI</div>
-              <div class="text-[11px] text-slate-500">Sistem Manajemen Dokumen Digital Terpadu • Sidoarjo, Jawa Timur</div>
+              <div class="text-[11px] text-slate-500">DDMS - DAFI Document Management System • Sidoarjo, Jawa Timur</div>
             </div>
           </div>
           <div class="text-right shrink-0">
-            <span class="inline-block px-2.5 py-1 rounded bg-slate-100 border border-slate-300 font-mono text-xs font-bold text-slate-800">
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 font-mono-code text-xs font-bold text-[#3B66F5]">
               ${escapeHtml(activeVer.versi)}
             </span>
-            <div class="text-[10px] text-slate-500 mt-1">${isLatest ? 'DOKUMEN AKTIF' : 'ARSIP VERSI LAMA'}</div>
+            <div class="text-[10px] text-slate-400 mt-1">${isLatest ? 'DOKUMEN AKTIF' : 'ARSIP VERSI LAMA'}</div>
           </div>
         </div>
 
         ${!isLatest ? `
-          <div class="p-3 rounded-lg bg-amber-50 border border-amber-300 text-xs text-amber-900 font-medium">
+          <div class="p-3 rounded-xl bg-amber-50 border border-amber-300 text-xs text-amber-900 font-medium">
             Perhatian: Anda sedang membaca arsip terdahulu (<strong>${escapeHtml(activeVer.versi)}</strong>, tanggal ${escapeHtml(activeVer.tanggalUpdate)}). Versi terbaru dokumen ini adalah <strong>${escapeHtml(doc.versi)}</strong>.
           </div>
         ` : ''}
 
-        <!-- Judul Tengah Surat / SK / SOP -->
         <div class="text-center space-y-1 py-2">
-          <div class="text-xs font-bold uppercase tracking-widest text-slate-500">${escapeHtml(doc.kategori)} RESMI SEKOLAH</div>
+          <div class="text-xs font-bold uppercase tracking-widest text-slate-400">${escapeHtml(doc.kategori)} RESMI SEKOLAH</div>
           <h2 class="text-base sm:text-lg font-extrabold text-slate-900 uppercase max-w-xl mx-auto leading-snug">
             ${escapeHtml(doc.judul)}
           </h2>
-          <div class="text-xs font-mono text-slate-600">Nomor: ${escapeHtml(doc.nomorDokumen)}</div>
+          <div class="text-xs font-mono-code text-slate-500">Nomor: ${escapeHtml(doc.nomorDokumen)}</div>
         </div>
 
-        <!-- Ringkasan Eksekutif -->
         <div class="space-y-1.5">
-          <div class="text-xs font-bold uppercase tracking-wider text-slate-500">I. Pokok Tujuan &amp; Ruang Lingkup</div>
-          <p class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-emerald-50/50 p-3.5 rounded-lg border border-emerald-100">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-400">I. Pokok Tujuan &amp; Ruang Lingkup</div>
+          <p class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-blue-50/50 p-3.5 rounded-xl border border-blue-100">
             ${escapeHtml(doc.ringkasan)}
           </p>
         </div>
 
-        <!-- Isi Ketentuan / Prosedur -->
         <div class="space-y-2.5">
-          <div class="text-xs font-bold uppercase tracking-wider text-slate-500">II. Uraian Ketentuan / Standar Operasional</div>
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-400">II. Uraian Ketentuan / Standar Operasional</div>
           ${pasalHtml}
         </div>
 
-        <!-- Catatan Revisi Versi Ini -->
-        <div class="p-3.5 rounded-lg bg-slate-100 border border-slate-200 text-xs space-y-1">
+        <div class="p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-xs space-y-1">
           <div class="font-bold text-slate-800">Catatan Riwayat Pembaruan (${escapeHtml(activeVer.versi)}):</div>
           <p class="text-slate-600">${escapeHtml(activeVer.catatanPerubahan)} — Diperbarui oleh <strong>${escapeHtml(activeVer.diperbaruiOleh)}</strong> pada ${escapeHtml(activeVer.tanggalUpdate)}.</p>
         </div>
 
-        <!-- Pengesahan & Tanda Tangan Digital -->
         <div class="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 text-xs">
-          <div class="space-y-1 text-slate-500">
-            <div>ID Arsip Digital: <span class="font-mono font-semibold text-slate-700">${escapeHtml(doc.id)}</span></div>
+          <div class="space-y-1 text-slate-400">
+            <div>ID Arsip Digital: <span class="font-mono-code font-semibold text-slate-700">${escapeHtml(doc.id)}</span></div>
             <div>Status Akses: <span class="font-semibold text-slate-700">${escapeHtml(doc.akses)}</span></div>
             <div>Terverifikasi di DDMS - DAFI Document Management System</div>
           </div>
-          <div class="text-left sm:text-right space-y-6">
+          <div class="text-left sm:text-right space-y-4">
             <div>
               <div>Ditetapkan di: Sidoarjo</div>
               <div>Pada tanggal: <strong>${escapeHtml(activeVer.tanggalUpdate)}</strong></div>
               <div class="font-bold text-slate-800 mt-1">${escapeHtml(doc.pembuat)} SMP DAFI</div>
             </div>
-            <div class="inline-block px-3 py-1 rounded border border-emerald-600/40 bg-emerald-50 text-emerald-800 font-semibold text-[11px]">
+            <div class="inline-block px-3 py-1 rounded-lg border border-blue-300 bg-blue-50 text-[#3B66F5] font-semibold text-[11px]">
               ✓ Disahkan Secara Digital — SMP DAFI
             </div>
           </div>
         </div>
       `;
 
-      // Render Sidebar Metadata
       const metaContainer = document.getElementById('viewerMetadataList');
       metaContainer.innerHTML = `
         <div class="grid grid-cols-3 gap-1 py-1.5 border-b border-slate-100">
-          <span class="text-slate-500">Nomor:</span>
-          <span class="col-span-2 font-mono font-semibold text-slate-800">${escapeHtml(doc.nomorDokumen)}</span>
+          <span class="text-slate-400">Nomor:</span>
+          <span class="col-span-2 font-mono-code font-semibold text-slate-800">${escapeHtml(doc.nomorDokumen)}</span>
         </div>
         <div class="grid grid-cols-3 gap-1 py-1.5 border-b border-slate-100">
-          <span class="text-slate-500">Kategori:</span>
+          <span class="text-slate-400">Kategori:</span>
           <span class="col-span-2 font-semibold text-slate-800">${escapeHtml(doc.kategori)}</span>
         </div>
         <div class="grid grid-cols-3 gap-1 py-1.5 border-b border-slate-100">
-          <span class="text-slate-500">Pembuat:</span>
+          <span class="text-slate-400">Pembuat:</span>
           <span class="col-span-2 font-semibold text-slate-800">${escapeHtml(doc.pembuat)}</span>
         </div>
         <div class="grid grid-cols-3 gap-1 py-1.5 border-b border-slate-100">
-          <span class="text-slate-500">Hak Akses:</span>
+          <span class="text-slate-400">Hak Akses:</span>
           <span class="col-span-2 font-semibold text-slate-800">${escapeHtml(doc.akses)}</span>
         </div>
         <div class="grid grid-cols-3 gap-1 py-1.5 border-b border-slate-100">
-          <span class="text-slate-500">Ukuran PDF:</span>
+          <span class="text-slate-400">Ukuran PDF:</span>
           <span class="col-span-2 text-slate-800">${escapeHtml(activeVer.ukuran || doc.ukuran)}</span>
         </div>
         <div class="py-1.5">
-          <span class="text-slate-500 block mb-1">Kata Kunci:</span>
+          <span class="text-slate-400 block mb-1">Kata Kunci:</span>
           <div class="flex flex-wrap gap-1">
             ${(doc.kataKunci || []).map(function(k) {
-              return `<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px]">#${escapeHtml(k)}</span>`;
+              return `<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[11px]">#${escapeHtml(k)}</span>`;
             }).join('')}
           </div>
         </div>
       `;
 
-      // Render Linimasa Riwayat di Sidebar Pembaca PDF
       document.getElementById('viewerHistoryCount').textContent = historyList.length + ' Versi';
       const timelineContainer = document.getElementById('viewerVersionTimeline');
       timelineContainer.innerHTML = historyList.slice().reverse().map(function(v, revIdx) {
         const realIdx = historyList.length - 1 - revIdx;
         const isCurrentSelected = realIdx === appState.currentViewingVersionIdx;
         return `
-          <div class="p-3 rounded-xl border ${isCurrentSelected ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-200 bg-slate-50'} space-y-1">
+          <div class="p-3 rounded-xl border ${isCurrentSelected ? 'border-[#3B66F5] bg-blue-50/40' : 'border-slate-200 bg-slate-50'} space-y-1">
             <div class="flex items-center justify-between">
-              <span class="font-mono text-xs font-bold ${isCurrentSelected ? 'text-emerald-800' : 'text-slate-800'}">
+              <span class="font-mono-code text-xs font-bold ${isCurrentSelected ? 'text-[#3B66F5]' : 'text-slate-800'}">
                 ${escapeHtml(v.versi)} ${realIdx === historyList.length - 1 ? '(Terbaru)' : ''}
               </span>
-              <span class="text-[11px] text-slate-500">${escapeHtml(v.tanggalUpdate)}</span>
+              <span class="text-[11px] text-slate-400">${escapeHtml(v.tanggalUpdate)}</span>
             </div>
-            <p class="text-xs text-slate-700 leading-snug">${escapeHtml(v.catatanPerubahan)}</p>
-            <div class="flex items-center justify-between pt-1 text-[11px] text-slate-500">
+            <p class="text-xs text-slate-600 leading-snug">${escapeHtml(v.catatanPerubahan)}</p>
+            <div class="flex items-center justify-between pt-1 text-[11px] text-slate-400">
               <span>Oleh: ${escapeHtml(v.diperbaruiOleh)}</span>
               ${!isCurrentSelected ? `
-                <button type="button" onclick="openPdfViewer('${escapeHtml(doc.id)}', ${realIdx})" class="font-semibold text-emerald-700 hover:underline">Buka Versi Ini</button>
-              ` : `<span class="font-semibold text-emerald-700">Sedang Dibaca</span>`}
+                <button type="button" onclick="openPdfViewer('${escapeHtml(doc.id)}', ${realIdx})" class="font-semibold text-[#3B66F5] hover:underline">Buka Versi Ini</button>
+              ` : `<span class="font-semibold text-[#3B66F5]">Sedang Dibaca</span>`}
             </div>
           </div>
         `;
@@ -2107,16 +2332,12 @@ function jsonOut_(obj) {
       }
     }
 
-    // -----------------------------------------------------------------------
-    // 11. FITUR UPLOAD PDF, DETEKSI PINTAR DUPLIKASI & PEMBARUAN VERSI
-    // -----------------------------------------------------------------------
     function handleOpenUploadModal(prefillData) {
       if (!appState.currentUser) {
-        openLoginModal('Untuk menjaga keamanan arsip SMP DAFI, fitur Unggah & Pembaruan Dokumen PDF hanya dapat diakses setelah Anda login.');
+        openLoginModal('Untuk menjaga keamanan arsip DDMS SMP DAFI, fitur Unggah & Pembaruan Dokumen PDF memerlukan login terlebih dahulu.');
         return;
       }
 
-      // Reset file state
       appState.pendingUploadBase64 = null;
       appState.pendingUploadBlobUrl = null;
       appState.pendingUploadFileName = '';
@@ -2168,7 +2389,7 @@ function jsonOut_(obj) {
       const submitBtn = document.getElementById('submitUploadBtn');
 
       if (mode === 'update') {
-        btnUpdate.className = 'py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-sm transition';
+        btnUpdate.className = 'py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-xs transition';
         btnNew.className = 'py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition';
         existingWrapper.classList.remove('hidden');
         badge.textContent = 'Mode Perbarui Versi Dokumen';
@@ -2181,11 +2402,11 @@ function jsonOut_(obj) {
         }
         populateFormForVersionUpdate();
       } else {
-        btnNew.className = 'py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-sm transition';
+        btnNew.className = 'py-2 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-xs transition';
         btnUpdate.className = 'py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition';
         existingWrapper.classList.add('hidden');
         badge.textContent = 'Unggah Dokumen Baru';
-        title.textContent = 'Unggah Dokumen PDF ke Arsip SMP DAFI';
+        title.textContent = 'Upload File PDF ke DDMS SMP DAFI';
         submitBtn.textContent = 'Simpan & Publikasikan PDF';
         document.getElementById('formVersi').value = 'v1.0';
         document.getElementById('formCatatanRevisi').value = 'Unggahan dokumen resmi awal (rilis pertama).';
@@ -2239,21 +2460,18 @@ function jsonOut_(obj) {
       document.getElementById('selectedFileNameDisplay').textContent = 'File Terpilih: ' + file.name;
       document.getElementById('selectedFileSizeDisplay').textContent = 'Ukuran: ' + appState.pendingUploadFileSize + ' • Siap diproses';
 
-      // Buat Blob URL lokal agar bisa langsung dibaca di In-App PDF Viewer
       try {
         appState.pendingUploadBlobUrl = URL.createObjectURL(file);
       } catch (e) {
         appState.pendingUploadBlobUrl = null;
       }
 
-      // Baca sebagai Base64 untuk dikirim ke GAS
       const reader = new FileReader();
       reader.onload = function(evt) {
         appState.pendingUploadBase64 = evt.target.result;
       };
       reader.readAsDataURL(file);
 
-      // Jika judul masih kosong, isi otomatis dari nama file PDF dan jalankan deteksi duplikasi
       const judulInput = document.getElementById('formJudul');
       if (judulInput && !judulInput.value.trim()) {
         const cleanTitle = file.name.replace(/\.pdf$/i, '').replace(/[_-]+/g, ' ');
@@ -2262,7 +2480,6 @@ function jsonOut_(obj) {
       checkUploadSimilarityLive();
     }
 
-    // Algoritma Pintar Kemiripan Judul / Nomor Dokumen
     function calculateSimilarityScore(strA, strB) {
       const cleanA = String(strA || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
       const cleanB = String(strB || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
@@ -2320,14 +2537,14 @@ function jsonOut_(obj) {
       alertBox.innerHTML = `
         <div class="flex items-start justify-between gap-3">
           <div class="space-y-1">
-            <div class="font-bold text-amber-950 flex items-center gap-1.5">
-              <span>⚡ Deteksi Pintar: Dokumen Serupa Sudah Ada di Database!</span>
+            <div class="font-bold text-amber-950">
+              ⚡ Deteksi Pintar: Dokumen Serupa Sudah Ada di Database!
             </div>
             <p class="text-amber-900 leading-relaxed">
-              Ditemukan arsip <strong>"${escapeHtml(topMatch.judul)}"</strong> (Nomor: <span class="font-mono">${escapeHtml(topMatch.nomorDokumen)}</span>, Versi aktif: <strong>${escapeHtml(topMatch.versi)}</strong>, diperbarui ${escapeHtml(topMatch.tanggalUpdate)}).
+              Ditemukan arsip <strong>"${escapeHtml(topMatch.judul)}"</strong> (Nomor: <span class="font-mono-code">${escapeHtml(topMatch.nomorDokumen)}</span>, Versi: <strong>${escapeHtml(topMatch.versi)}</strong>).
             </p>
           </div>
-          <button type="button" onclick="switchUploadFormMode('update', '${escapeHtml(topMatch.id)}')" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs shrink-0 transition">
+          <button type="button" onclick="switchUploadFormMode('update', '${escapeHtml(topMatch.id)}')" class="px-3 py-1.5 rounded-lg bg-[#3B66F5] text-white font-semibold text-xs shrink-0">
             Perbarui ke ${escapeHtml(nextVer)}
           </button>
         </div>
@@ -2386,7 +2603,7 @@ function jsonOut_(obj) {
       const kataKunci = document.getElementById('formKataKunci').value.split(',').map(function(k) { return k.trim(); }).filter(Boolean);
       const ringkasan = document.getElementById('formRingkasan').value.trim();
       const catatanRevisi = document.getElementById('formCatatanRevisi').value.trim();
-      const today = '2026-10-28';
+      const today = '2026-10-29';
       const uploaderName = appState.currentUser ? appState.currentUser.namaLengkap : pembuat;
       const fileSize = appState.pendingUploadFileSize || '360 KB';
 
@@ -2419,7 +2636,8 @@ function jsonOut_(obj) {
           pdfBlobUrl: appState.pendingUploadBlobUrl || null
         });
 
-        // Kirim ke GAS jika URL dikonfigurasi
+        appState.selectedDocId = doc.id;
+
         if (appState.gasWebAppUrl) {
           await sendToGasBackend({
             action: 'updateVersion',
@@ -2473,6 +2691,7 @@ function jsonOut_(obj) {
         };
 
         appState.documents.unshift(newDoc);
+        appState.selectedDocId = newId;
 
         if (appState.gasWebAppUrl) {
           await sendToGasBackend({
@@ -2501,9 +2720,6 @@ function jsonOut_(obj) {
       }
     }
 
-    // -----------------------------------------------------------------------
-    // 12. RENDER TAB ASISTEN PINTAR & REKOMENDASI DOKUMEN (SMART GAP ANALYSIS)
-    // -----------------------------------------------------------------------
     function renderSmartAssistant() {
       const catProgressContainer = document.getElementById('smartCategoryProgress');
       const missingContainer = document.getElementById('smartMissingList');
@@ -2519,15 +2735,15 @@ function jsonOut_(obj) {
         const docsInCat = appState.documents.filter(function(d) { return d.kategori === cat; }).length;
 
         return `
-          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-800">${escapeHtml(cat)}</span>
-              <span class="text-xs font-bold text-emerald-700">${pct}% Standar</span>
+              <span class="text-xs font-bold text-slate-700">${escapeHtml(cat)}</span>
+              <span class="text-xs font-bold text-[#3B66F5]">${pct}% Standar</span>
             </div>
             <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
-              <div class="h-full bg-emerald-600 rounded-full transition-all" style="width: ${pct}%"></div>
+              <div class="h-full bg-[#3B66F5] rounded-full" style="width: ${pct}%"></div>
             </div>
-            <div class="flex items-center justify-between text-[11px] text-slate-500">
+            <div class="flex items-center justify-between text-[11px] text-slate-400">
               <span>${doneForCat.length}/${stdForCat.length} Standar Wajib</span>
               <span>Total: ${docsInCat} PDF</span>
             </div>
@@ -2552,32 +2768,29 @@ function jsonOut_(obj) {
 
       if (missingItems.length === 0) {
         missingContainer.innerHTML = `
-          <div class="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-1">
-            <div class="text-sm font-bold text-emerald-900">Seluruh Dokumen Standar SMP DAFI Sudah Terpenuhi!</div>
-            <p class="text-xs text-emerald-700">Anda dapat menambahkan target dokumen standar baru jika diperlukan.</p>
+          <div class="p-6 rounded-2xl bg-blue-50 border border-blue-200 text-center space-y-1">
+            <div class="text-sm font-bold text-[#3B66F5]">Seluruh Dokumen Standar SMP DAFI Sudah Terpenuhi!</div>
+            <p class="text-xs text-slate-500">Anda dapat menambahkan target dokumen standar baru jika diperlukan.</p>
           </div>
         `;
       } else {
         missingContainer.innerHTML = missingItems.map(function(item) {
-          const prioStyle = item.prioritas === 'Tinggi'
-            ? 'bg-red-100 text-red-800 border-red-200'
-            : 'bg-amber-100 text-amber-800 border-amber-200';
           return `
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-amber-400 shadow-sm transition space-y-2.5">
+            <div class="cloud-card p-4 space-y-2.5">
               <div class="flex items-center justify-between gap-2 flex-wrap">
                 <div class="flex items-center gap-1.5">
                   <span class="px-2 py-0.5 rounded text-[11px] font-semibold border ${getCategoryBadgeStyle(item.kategori)}">${escapeHtml(item.kategori)}</span>
-                  <span class="px-2 py-0.5 rounded text-[11px] font-semibold border ${prioStyle}">Prioritas ${escapeHtml(item.prioritas)}</span>
+                  <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">Prioritas ${escapeHtml(item.prioritas)}</span>
                 </div>
-                <span class="text-[11px] text-slate-500">PIC: <strong>${escapeHtml(item.pembuatDisarankan)}</strong></span>
+                <span class="text-[11px] text-slate-400">PIC: <strong class="text-slate-700">${escapeHtml(item.pembuatDisarankan)}</strong></span>
               </div>
               <div>
-                <h4 class="text-sm font-bold text-slate-900">${escapeHtml(item.judulSaran)}</h4>
-                <p class="text-xs text-slate-600 mt-0.5">${escapeHtml(item.alasan)}</p>
+                <h4 class="text-sm font-bold text-slate-800">${escapeHtml(item.judulSaran)}</h4>
+                <p class="text-xs text-slate-500 mt-0.5">${escapeHtml(item.alasan)}</p>
               </div>
               <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                <div class="text-[11px] text-slate-400">Status: <span class="text-amber-700 font-semibold">Belum Ada di Database</span></div>
-                <button type="button" onclick="triggerUploadFromSuggestion('${escapeHtml(item.id)}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition">
+                <span class="text-[11px] font-semibold text-amber-600">Belum Ada di Library</span>
+                <button type="button" onclick="triggerUploadFromSuggestion('${escapeHtml(item.id)}')" class="px-3 py-1.5 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-white text-xs font-semibold transition">
                   + Unggah Dokumen Ini
                 </button>
               </div>
@@ -2588,18 +2801,18 @@ function jsonOut_(obj) {
 
       fulfilledContainer.innerHTML = fulfilledItems.map(function(pair) {
         return `
-          <div class="bg-white p-3.5 rounded-xl border border-slate-200 flex items-start justify-between gap-3">
+          <div class="cloud-card p-3.5 flex items-start justify-between gap-3">
             <div class="space-y-1 min-w-0">
               <div class="flex items-center gap-1.5">
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Sudah Ada (${escapeHtml(pair.doc.versi)})</span>
-                <span class="text-[11px] font-mono text-slate-400 truncate">${escapeHtml(pair.doc.nomorDokumen)}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">Sudah Ada (${escapeHtml(pair.doc.versi)})</span>
+                <span class="text-[11px] font-mono-code text-slate-400 truncate">${escapeHtml(pair.doc.nomorDokumen)}</span>
               </div>
-              <div class="text-xs font-bold text-slate-900 truncate">${escapeHtml(pair.doc.judul)}</div>
-              <div class="text-[11px] text-slate-500">Update terakhir: ${escapeHtml(pair.doc.tanggalUpdate)}</div>
+              <div class="text-xs font-bold text-slate-800 truncate">${escapeHtml(pair.doc.judul)}</div>
+              <div class="text-[11px] text-slate-400">Update: ${escapeHtml(pair.doc.tanggalUpdate)}</div>
             </div>
             <div class="flex flex-col gap-1 shrink-0">
               <button type="button" onclick="openPdfViewer('${escapeHtml(pair.doc.id)}')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">Baca</button>
-              <button type="button" onclick="openDirectUpdateVersion('${escapeHtml(pair.doc.id)}')" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold">Revisi</button>
+              <button type="button" onclick="openDirectUpdateVersion('${escapeHtml(pair.doc.id)}')" class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#3B66F5] text-xs font-semibold">Revisi</button>
             </div>
           </div>
         `;
@@ -2624,7 +2837,7 @@ function jsonOut_(obj) {
       if (!box) return;
 
       if (val.length < 3) {
-        box.className = 'rounded-xl p-4 bg-slate-50 border border-slate-200 text-sm text-slate-600';
+        box.className = 'rounded-xl p-4 bg-slate-50 border border-slate-200/80 text-xs sm:text-sm text-slate-500';
         box.textContent = 'Masukkan minimal 3 karakter untuk mengecek ketersediaan atau duplikasi dokumen di database SMP DAFI.';
         return;
       }
@@ -2632,25 +2845,25 @@ function jsonOut_(obj) {
       const matches = findSimilarExistingDocuments(val, val);
       if (matches.length > 0) {
         const m = matches[0].doc;
-        box.className = 'rounded-xl p-4 bg-amber-50 border border-amber-300 text-xs sm:text-sm space-y-2';
+        box.className = 'rounded-xl p-4 bg-amber-50 border border-amber-200 text-xs sm:text-sm space-y-2';
         box.innerHTML = `
-          <div class="font-bold text-amber-950">⚠️ Info Pintar: Dokumen Serupa Sudah Tersedia di Arsip SMP DAFI!</div>
-          <p class="text-amber-900">
+          <div class="font-bold text-amber-900">⚠️ Info Pintar: Dokumen Serupa Sudah Tersedia di Library!</div>
+          <p class="text-amber-800">
             Arsip <strong>"${escapeHtml(m.judul)}"</strong> (${escapeHtml(m.nomorDokumen)}) sudah terdaftar dengan versi aktif <strong>${escapeHtml(m.versi)}</strong> oleh ${escapeHtml(m.pembuat)}.
           </p>
           <div class="flex items-center gap-2 pt-1">
-            <button type="button" onclick="openPdfViewer('${escapeHtml(m.id)}')" class="px-3 py-1.5 rounded-lg bg-white border border-amber-400 text-amber-950 font-semibold text-xs">Baca Dokumen Existing</button>
-            <button type="button" onclick="openDirectUpdateVersion('${escapeHtml(m.id)}')" class="px-3 py-1.5 rounded-lg bg-amber-600 text-white font-semibold text-xs">Unggah sebagai Versi Baru (${escapeHtml(incrementVersionString(m.versi))})</button>
+            <button type="button" onclick="openPdfViewer('${escapeHtml(m.id)}')" class="px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-900 font-semibold text-xs">Baca Dokumen Existing</button>
+            <button type="button" onclick="openDirectUpdateVersion('${escapeHtml(m.id)}')" class="px-3 py-1.5 rounded-lg bg-[#3B66F5] text-white font-semibold text-xs">Unggah sebagai Versi Baru (${escapeHtml(incrementVersionString(m.versi))})</button>
           </div>
         `;
       } else {
-        box.className = 'rounded-xl p-4 bg-emerald-50 border border-emerald-200 text-xs sm:text-sm space-y-2';
+        box.className = 'rounded-xl p-4 bg-blue-50 border border-blue-200 text-xs sm:text-sm space-y-2';
         box.innerHTML = `
-          <div class="font-bold text-emerald-950">✓ Belum Ada Dokumen Serupa di Database</div>
-          <p class="text-emerald-800">
+          <div class="font-bold text-[#3B66F5]">✓ Belum Ada Dokumen Serupa di Library</div>
+          <p class="text-slate-600">
             Judul <strong>"${escapeHtml(val)}"</strong> belum ditemukan di dalam katalog. Anda dapat mengunggahnya sebagai dokumen baru.
           </p>
-          <button type="button" onclick="handleOpenUploadModal({ judul: '${escapeHtml(val)}', kategori: 'SOP', pembuat: 'Kepala Sekolah', kataKunci: ['${escapeHtml(val.toLowerCase())}'], alasan: '' })" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold text-xs">
+          <button type="button" onclick="handleOpenUploadModal({ judul: '${escapeHtml(val)}', kategori: 'SOP', pembuat: 'Kepala Sekolah', kataKunci: ['${escapeHtml(val.toLowerCase())}'], alasan: '' })" class="px-3 py-1.5 rounded-lg bg-[#3B66F5] text-white font-semibold text-xs">
             + Buat &amp; Unggah Dokumen Baru Ini
           </button>
         `;
@@ -2683,12 +2896,9 @@ function jsonOut_(obj) {
       document.getElementById('stdAlasan').value = '';
       document.getElementById('stdKataKunci').value = '';
       refreshAllViews();
-      showToast('Target dokumen standar baru berhasil ditambahkan ke daftar pantauan pintar.', 'success');
+      showToast('Target dokumen standar baru berhasil ditambahkan.', 'success');
     }
 
-    // -----------------------------------------------------------------------
-    // 13. RENDER TAB RIWAYAT PEMBARUAN GLOBAL (AUDIT TRAIL)
-    // -----------------------------------------------------------------------
     function populateHistoryFilterDropdown() {
       const sel = document.getElementById('historyDocFilter');
       if (!sel) return;
@@ -2733,23 +2943,23 @@ function jsonOut_(obj) {
 
       container.innerHTML = allEvents.map(function(ev) {
         return `
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="space-y-1">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="px-2 py-0.5 rounded font-mono text-xs font-bold ${ev.isLatest ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}">
+                <span class="px-2 py-0.5 rounded font-mono-code text-xs font-bold ${ev.isLatest ? 'bg-[#3B66F5] text-white' : 'bg-slate-200 text-slate-700'}">
                   ${escapeHtml(ev.versi)} ${ev.isLatest ? '(Aktif)' : '(Arsip)'}
                 </span>
                 <span class="px-2 py-0.5 rounded text-[11px] font-semibold border ${getCategoryBadgeStyle(ev.kategori)}">${escapeHtml(ev.kategori)}</span>
-                <span class="text-xs text-slate-500">${escapeHtml(ev.tanggalUpdate)} • Oleh: <strong>${escapeHtml(ev.diperbaruiOleh)}</strong></span>
+                <span class="text-xs text-slate-400">${escapeHtml(ev.tanggalUpdate)} • Oleh: <strong class="text-slate-700">${escapeHtml(ev.diperbaruiOleh)}</strong></span>
               </div>
-              <h4 class="text-sm font-bold text-slate-900">${escapeHtml(ev.judul)}</h4>
-              <p class="text-xs text-slate-600">${escapeHtml(ev.catatanPerubahan)}</p>
+              <h4 class="text-sm font-bold text-slate-800">${escapeHtml(ev.judul)}</h4>
+              <p class="text-xs text-slate-500">${escapeHtml(ev.catatanPerubahan)}</p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
-              <button type="button" onclick="openPdfViewer('${escapeHtml(ev.docId)}', ${ev.versionIdx})" class="px-3 py-1.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition">
+              <button type="button" onclick="openPdfViewer('${escapeHtml(ev.docId)}', ${ev.versionIdx})" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition">
                 Baca Versi ${escapeHtml(ev.versi)}
               </button>
-              <button type="button" onclick="openDirectUpdateVersion('${escapeHtml(ev.docId)}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold text-white transition">
+              <button type="button" onclick="openDirectUpdateVersion('${escapeHtml(ev.docId)}')" class="px-3 py-1.5 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-xs font-semibold text-white transition">
                 + Perbarui Lagi
               </button>
             </div>
@@ -2758,9 +2968,6 @@ function jsonOut_(obj) {
       }).join('');
     }
 
-    // -----------------------------------------------------------------------
-    // 14. INTEGRASI GOOGLE APPS SCRIPT (GAS) & SINKRONISASI CORS-SAFE
-    // -----------------------------------------------------------------------
     function updateGasStatusBadge() {
       const dot = document.getElementById('gasStatusDot');
       const text = document.getElementById('gasStatusText');
@@ -2820,7 +3027,6 @@ function jsonOut_(obj) {
     async function sendToGasBackend(payload) {
       if (!appState.gasWebAppUrl) return null;
       try {
-        // Menggunakan Content-Type text/plain agar terhindar dari CORS Preflight di GitHub Pages
         const response = await fetch(appState.gasWebAppUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
