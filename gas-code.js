@@ -22,7 +22,7 @@ const GAS_CONFIG = {
   // TEMPELKAN URL WEB APP GAS ANDA DI BAWAH INI (Berakhiran /exec)
   // Contoh: 'https://script.google.com/macros/s/AKfycbz_XYZ123.../exec'
   // ==========================================================================
-  DEFAULT_WEB_APP_URL: '',
+  DEFAULT_WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbxzAv0zUvGxxN7c-RZLco3ig05WmBzWjOFa61VqJOtiME6ABx6Yw1gvCfhnWOfoEg7D0Q/exec',
 
   // Pengaturan Komunikasi
   TIMEOUT_MS: 30000,
