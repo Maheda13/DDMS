@@ -1,0 +1,127 @@
+:root {
+  --bg-canvas: #EEF2F6;
+  --card-bg: #FFFFFF;
+  --primary-blue: #3B66F5;
+  --primary-blue-hover: #2952D9;
+  --folder-back: #638BFF;
+  --folder-front: #85A6FF;
+  --border-soft: #E6ECF5;
+  --border-active: #789DFF;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-canvas);
+  color: #1E293B;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.cloud-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 10px 35px -10px rgba(30, 41, 59, 0.06), 0 2px 6px -1px rgba(30, 41, 59, 0.03);
+  border: 1px solid #E8EEF7;
+}
+
+.folder-tile::after {
+  content: attr(data-files-label);
+  display: block;
+  font-size: 11px;
+  color: #94A3B8;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.folder-tile {
+  background: #FFFFFF;
+  border: 1px solid #EEF2F8;
+  border-radius: 14px;
+  transition: all 0.18s ease;
+}
+
+.folder-tile:hover {
+  border-color: #B9CEFF;
+  box-shadow: 0 8px 20px -6px rgba(59, 102, 245, 0.12);
+  transform: translateY(-2px);
+}
+
+.folder-tile.active-folder {
+  border: 1.5px solid #638BFF;
+  background: #F7FAFF;
+  box-shadow: 0 8px 22px -6px rgba(59, 102, 245, 0.16);
+}
+
+.file-tile {
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 16px;
+  transition: all 0.18s ease;
+}
+
+.file-tile:hover {
+  background: #FFFFFF;
+  border-color: #DCE6F7;
+  box-shadow: 0 8px 24px -8px rgba(30, 41, 59, 0.08);
+}
+
+.file-tile.selected-file {
+  background: #FFFFFF;
+  border-color: #7D9FFF;
+  box-shadow: 0 14px 30px -8px rgba(59, 102, 245, 0.18), 0 4px 10px -2px rgba(59, 102, 245, 0.08);
+}
+
+.dropzone-dashed {
+  border: 1.5px dashed #CBD5E1;
+  border-radius: 16px;
+  background: #FAFBFD;
+  transition: all 0.18s ease;
+}
+
+.dropzone-dashed:hover {
+  border-color: #3B66F5;
+  background: #F4F7FF;
+}
+
+.pdf-page-sheet {
+  background: #FFFFFF;
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.18);
+  border: 1px solid #E2E8F0;
+  transition: transform 0.2s ease;
+  transform-origin: top center;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printablePdfArea, #printablePdfArea * {
+    visibility: visible;
+  }
+  #printablePdfArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+
