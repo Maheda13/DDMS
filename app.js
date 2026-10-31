@@ -320,7 +320,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
         /**
      * Mengambil kode backend Google Apps Script (Code.gs).
      * 1. Coba fetch 'Code.gs' secara dinamis (otomatis mutakhir di server / GitHub Pages).
-     * 2. Jika fetch gagal / offline / protokol file://, gunakan window.DMS_GAS_CODE dari gas-code.js.
+     * 2. Jika fetch gagal / offline / protokol file://, tampilkan fallback panduan ramah.
      */
     async function getGasCode() {
       try {
@@ -334,7 +334,13 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
       } catch (e) {
         // Fallback untuk protokol file:// atau mode offline
       }
-      return window.DMS_GAS_CODE || '// Kode Google Apps Script (Code.gs) belum dimuat.';
+      return '// ==========================================================================\n' +
+             '// KODE BACKEND GOOGLE APPS SCRIPT (Code.gs)\n' +
+             '// ==========================================================================\n' +
+             '// Kode server tersimpan terpisah pada berkas "Code.gs".\n' +
+             '// Buka berkas Code.gs di folder repositori Anda, lalu salin dan tempelkan\n' +
+             '// ke Google Apps Script (Ekstensi > Apps Script di Google Sheets Anda).\n' +
+             '// ==========================================================================';
     }
 
     const STORAGE_KEY_TOKEN = 'smp_dafi_simdok_token_v1';
@@ -381,6 +387,9 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
     }
 
     function isValidGasUrl(url) {
+      if (window.GasConnector && typeof window.GasConnector.isValidUrl === 'function') {
+        return window.GasConnector.isValidUrl(url);
+      }
       if (!url) return false;
       const s = String(url).trim();
       return s.startsWith('https://script.google.com/macros/s/') && s.endsWith('/exec');
@@ -430,7 +439,11 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
     function initApp() {
       appState.documents = safeGetStorage(STORAGE_KEY_DOCS, null) || JSON.parse(JSON.stringify(INITIAL_DOCUMENTS));
       appState.standards = safeGetStorage(STORAGE_KEY_STANDARDS, null) || JSON.parse(JSON.stringify(INITIAL_STANDARD_DOCS));
-      appState.gasWebAppUrl = safeGetStorage(STORAGE_KEY_GAS_URL, '');
+      if (window.GasConnector && typeof window.GasConnector.getActiveUrl === 'function') {
+        appState.gasWebAppUrl = window.GasConnector.getActiveUrl();
+      } else {
+        appState.gasWebAppUrl = safeGetStorage(STORAGE_KEY_GAS_URL, '');
+      }
       appState.currentUser = safeGetStorage(STORAGE_KEY_USER, null);
       appState.authToken = safeGetStorage(STORAGE_KEY_TOKEN, '');
 
@@ -625,13 +638,18 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
       // 1. Jika terhubung ke Backend Google Apps Script, verifikasi dengan API backend
       if (isValidGasUrl(appState.gasWebAppUrl)) {
         try {
-          const resp = await fetch(appState.gasWebAppUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'login', username: username, password: password }),
-            redirect: 'follow'
-          });
-          const result = await resp.json();
+          let result;
+          if (window.GasConnector && typeof window.GasConnector.login === 'function') {
+            result = await window.GasConnector.login(username, password);
+          } else {
+            const resp = await fetch(appState.gasWebAppUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ action: 'login', username: username, password: password }),
+              redirect: 'follow'
+            });
+            result = await resp.json();
+          }
           if (result && result.status === 'ok') {
             loginFailAttempts = 0;
             appState.authToken = result.token || '';
@@ -1163,6 +1181,9 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
       if (val.indexOf('script.google.com') !== -1) {
         appState.gasWebAppUrl = val;
         safeSetStorage(STORAGE_KEY_GAS_URL, val);
+        if (window.GasConnector && typeof window.GasConnector.setActiveUrl === 'function') {
+          window.GasConnector.setActiveUrl(val);
+        }
         const gasUrlInput = document.getElementById('gasUrlInput');
         if (gasUrlInput) gasUrlInput.value = val;
         updateGasStatusBadge();
@@ -2406,6 +2427,20 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
       };
       appState.standards.push(newStd);
       safeSetStorage(STORAGE_KEY_STANDARDS, appState.standards);
+
+      if (appState.gasWebAppUrl) {
+        sendToGasBackend({
+          action: 'addSuggestion',
+          id: newStd.id,
+          judulSaran: newStd.judulSaran,
+          kategori: newStd.kategori,
+          pembuatDisarankan: newStd.pembuatDisarankan,
+          prioritas: newStd.prioritas,
+          alasan: newStd.alasan,
+          kataKunci: newStd.kataKunci
+        });
+      }
+
       closeAddStandardModal();
       document.getElementById('stdJudul').value = '';
       document.getElementById('stdAlasan').value = '';
@@ -2508,6 +2543,9 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
       }
       appState.gasWebAppUrl = url;
       safeSetStorage(STORAGE_KEY_GAS_URL, url);
+      if (window.GasConnector && typeof window.GasConnector.setActiveUrl === 'function') {
+        window.GasConnector.setActiveUrl(url);
+      }
       updateGasStatusBadge();
 
       if (!url) {
@@ -2520,16 +2558,22 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
     }
 
     async function syncFromGasBackend() {
-      if (!isValidGasUrl(appState.gasWebAppUrl)) {
+      const activeUrl = appState.gasWebAppUrl || (window.GasConnector ? window.GasConnector.getActiveUrl() : '');
+      if (!isValidGasUrl(activeUrl)) {
         showToast('Masukkan URL Web App GAS yang sah terlebih dahulu pada kolom konfigurasi.', 'warning');
         return;
       }
       try {
-        const response = await fetch(appState.gasWebAppUrl + '?action=getAll', {
-          method: 'GET',
-          redirect: 'follow'
-        });
-        const data = await response.json();
+        let data;
+        if (window.GasConnector && typeof window.GasConnector.getAllDocuments === 'function') {
+          data = await window.GasConnector.getAllDocuments();
+        } else {
+          const response = await fetch(activeUrl + '?action=getAll', {
+            method: 'GET',
+            redirect: 'follow'
+          });
+          data = await response.json();
+        }
         if (data && data.status === 'ok' && Array.isArray(data.documents) && data.documents.length > 0) {
           appState.documents = data.documents;
           safeSetStorage(STORAGE_KEY_DOCS, appState.documents);
@@ -2544,18 +2588,25 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v1';
     }
 
     async function sendToGasBackend(payload) {
-      if (!isValidGasUrl(appState.gasWebAppUrl)) return null;
+      const activeUrl = appState.gasWebAppUrl || (window.GasConnector ? window.GasConnector.getActiveUrl() : '');
+      if (!isValidGasUrl(activeUrl)) return null;
       try {
-        const securePayload = Object.assign({}, payload, {
-          authToken: appState.authToken || (appState.currentUser && appState.currentUser.token) || ''
-        });
-        const response = await fetch(appState.gasWebAppUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(securePayload),
-          redirect: 'follow'
-        });
-        const resData = await response.json();
+        const token = appState.authToken || (appState.currentUser && appState.currentUser.token) || '';
+        let resData;
+        if (window.GasConnector && typeof window.GasConnector.sendPost === 'function') {
+          resData = await window.GasConnector.sendPost(payload.action, payload, token);
+        } else {
+          const securePayload = Object.assign({}, payload, {
+            authToken: token
+          });
+          const response = await fetch(activeUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(securePayload),
+            redirect: 'follow'
+          });
+          resData = await response.json();
+        }
         if (resData && resData.status === 'error' && (resData.message.includes('token') || resData.message.includes('Sesi') || resData.message.includes('Autentikasi'))) {
           showToast('Sesi autentikasi Anda telah kedaluwarsa. Silakan login kembali.', 'warning');
           handleLogout();
