@@ -22,12 +22,12 @@ const GAS_CONFIG = {
   // TEMPELKAN URL WEB APP GAS ANDA DI BAWAH INI (Berakhiran /exec)
   // Contoh: 'https://script.google.com/macros/s/AKfycbz_XYZ123.../exec'
   // ==========================================================================
-  DEFAULT_WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbxzAv0zUvGxxN7c-RZLco3ig05WmBzWjOFa61VqJOtiME6ABx6Yw1gvCfhnWOfoEg7D0Q/exec',
+  DEFAULT_WEB_APP_URL: '',
 
   // Pengaturan Komunikasi
   TIMEOUT_MS: 30000,
   STORAGE_KEY_GAS_URL: 'smp_dafi_simdok_gas_url_v1',
-  SCHOOL_IDENTITY: 'SMP DAFI Sidoarjo'
+  SCHOOL_IDENTITY: 'SMP IT Darul Fikri (DAFI) Sidoarjo'
 };
 
 /**
@@ -153,6 +153,20 @@ const GasConnector = {
    */
   updateVersion: async function(versionPayload, authToken) {
     return await this.sendPost('updateVersion', versionPayload, authToken);
+  },
+
+  /**
+   * Menyetujui atau meminta revisi pengajuan dokumen (Khusus Akun Kepala Sekolah)
+   * Menyimpan token TTE (SHA-256) dan stempel waktu pengesahan resmi
+   */
+  approveDocument: async function(docId, status, catatan, authToken, signatureToken, tanggalDisetujui) {
+    return await this.sendPost('approveDocument', { 
+      docId: docId, 
+      status: status, 
+      catatan: catatan,
+      signatureToken: signatureToken || '',
+      tanggalDisetujui: tanggalDisetujui || ''
+    }, authToken);
   },
 
   /**

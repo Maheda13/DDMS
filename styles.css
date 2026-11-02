@@ -1,57 +1,172 @@
 :root {
-  --bg-canvas: #EEF2F6;
+  /* Brand DAFI Colors (Extracted from official logo) */
+  --dafi-red: #D40D14;
+  --dafi-red-hover: #B90B12;
+  --dafi-red-dark: #96090E;
+  --dafi-red-light: #FEF2F2;
+  --dafi-red-border: #FECACA;
+  --dafi-charcoal: #62615F;
+  --dafi-charcoal-dark: #2B2A28;
+  --dafi-charcoal-light: #F4F4F3;
+
+  /* Theme tokens */
+  --bg-canvas: #F9F9F8;
   --card-bg: #FFFFFF;
-  --primary-blue: #3B66F5;
-  --primary-blue-hover: #2952D9;
-  --folder-back: #638BFF;
-  --folder-front: #85A6FF;
-  --border-soft: #E6ECF5;
-  --border-active: #789DFF;
+  --primary-brand: #D40D14;
+  --primary-brand-hover: #B90B12;
+  --border-soft: #E7E6E3;
+  --border-active: #F87171;
 }
 
 body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-canvas);
-  color: #1E293B;
+  color: var(--dafi-charcoal-dark);
 }
 
 .font-mono-code {
   font-family: 'JetBrains Mono', monospace;
 }
 
+/* Custom Uniform Form Controls (Chevron Dropdown & Smooth Inputs) */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 0.9em;
+  padding-right: 2rem !important;
+}
+
 .cloud-card {
   background: #FFFFFF;
   border-radius: 20px;
-  box-shadow: 0 10px 35px -10px rgba(30, 41, 59, 0.06), 0 2px 6px -1px rgba(30, 41, 59, 0.03);
-  border: 1px solid #E8EEF7;
+  box-shadow: 0 10px 35px -10px rgba(43, 42, 40, 0.05), 0 2px 6px -1px rgba(43, 42, 40, 0.02);
+  border: 1px solid var(--border-soft);
+}
+
+/* Modern Segmented Category Pills Bar */
+.cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #57534E;
+  background: #FFFFFF;
+  border: 1px solid #E7E5E4;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.cat-pill:hover {
+  background: #FAFAF9;
+  border-color: #D6D3D1;
+  color: #1C1917;
+  transform: translateY(-1px);
+}
+
+.cat-pill.active-folder {
+  background: var(--dafi-red);
+  color: #FFFFFF;
+  border-color: var(--dafi-red);
+  box-shadow: 0 4px 14px -2px rgba(212, 13, 20, 0.35);
+}
+
+.cat-pill .count-badge {
+  background: #F5F5F4;
+  color: #78716C;
+  border-radius: 9999px;
+  padding: 1.5px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.18s ease;
+}
+
+.cat-pill.active-folder .count-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+/* Modern Document Card */
+.file-card-modern {
+  background: #FFFFFF;
+  border: 1px solid #E7E5E4;
+  border-radius: 18px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.file-card-modern:hover {
+  border-color: var(--dafi-red-border);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -6px rgba(212, 13, 20, 0.10);
+}
+
+.file-card-modern.selected-file {
+  border-color: var(--dafi-red);
+  box-shadow: 0 10px 26px -6px rgba(212, 13, 20, 0.20);
+  background: #FFFAFA;
+}
+
+/* Shimmer Skeleton Loader */
+@keyframes shimmerAnim {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: #F5F5F4;
+  border-radius: 12px;
+}
+
+.skeleton-shimmer::after {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.6) 20%,
+    rgba(255, 255, 255, 0.6) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmerAnim 1.4s infinite;
+  content: '';
 }
 
 .folder-tile::after {
   content: attr(data-files-label);
   display: block;
   font-size: 11px;
-  color: #94A3B8;
+  color: #A8A29E;
   margin-top: 4px;
   font-weight: 500;
 }
 
 .folder-tile {
   background: #FFFFFF;
-  border: 1px solid #EEF2F8;
+  border: 1px solid #E7E5E4;
   border-radius: 14px;
   transition: all 0.18s ease;
 }
 
 .folder-tile:hover {
-  border-color: #B9CEFF;
-  box-shadow: 0 8px 20px -6px rgba(59, 102, 245, 0.12);
+  border-color: var(--dafi-red-border);
+  box-shadow: 0 8px 20px -6px rgba(212, 13, 20, 0.10);
   transform: translateY(-2px);
 }
 
 .folder-tile.active-folder {
-  border: 1.5px solid #638BFF;
-  background: #F7FAFF;
-  box-shadow: 0 8px 22px -6px rgba(59, 102, 245, 0.16);
+  border: 1.5px solid var(--dafi-red);
+  background: var(--dafi-red-light);
+  box-shadow: 0 8px 22px -6px rgba(212, 13, 20, 0.15);
 }
 
 .file-tile {
@@ -63,32 +178,32 @@ body {
 
 .file-tile:hover {
   background: #FFFFFF;
-  border-color: #DCE6F7;
-  box-shadow: 0 8px 24px -8px rgba(30, 41, 59, 0.08);
+  border-color: #E7E5E4;
+  box-shadow: 0 8px 24px -8px rgba(43, 42, 40, 0.08);
 }
 
 .file-tile.selected-file {
   background: #FFFFFF;
-  border-color: #7D9FFF;
-  box-shadow: 0 14px 30px -8px rgba(59, 102, 245, 0.18), 0 4px 10px -2px rgba(59, 102, 245, 0.08);
+  border-color: var(--dafi-red);
+  box-shadow: 0 14px 30px -8px rgba(212, 13, 20, 0.18), 0 4px 10px -2px rgba(212, 13, 20, 0.08);
 }
 
 .dropzone-dashed {
-  border: 1.5px dashed #CBD5E1;
+  border: 1.5px dashed #D6D3D1;
   border-radius: 16px;
-  background: #FAFBFD;
+  background: #FAFAF9;
   transition: all 0.18s ease;
 }
 
 .dropzone-dashed:hover {
-  border-color: #3B66F5;
-  background: #F4F7FF;
+  border-color: var(--dafi-red);
+  background: var(--dafi-red-light);
 }
 
 .pdf-page-sheet {
   background: #FFFFFF;
-  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.18);
-  border: 1px solid #E2E8F0;
+  box-shadow: 0 12px 32px -8px rgba(43, 42, 40, 0.15);
+  border: 1px solid #E7E5E4;
   transition: transform 0.2s ease;
   transform-origin: top center;
 }
@@ -98,21 +213,26 @@ body {
   height: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #F5F5F4;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #D6D3D1;
   border-radius: 9999px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: var(--dafi-charcoal);
 }
 
 @media print {
   body * {
     visibility: hidden;
   }
-  #printablePdfArea, #printablePdfArea * {
+  body.printing-certificate #printableCertificateArea,
+  body.printing-certificate #printableCertificateArea * {
+    visibility: visible;
+  }
+  body:not(.printing-certificate) #printablePdfArea,
+  body:not(.printing-certificate) #printablePdfArea * {
     visibility: visible;
   }
   #printablePdfArea {
@@ -123,5 +243,105 @@ body {
     box-shadow: none !important;
     border: none !important;
   }
+  #printableCertificateArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: block !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #FFFFFF !important;
+  }
 }
 
+/* TTE (Tanda Tangan Elektronik) & Digital Seal Styles */
+.dafi-tte-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.75) 0%, #FFFFFF 50%, rgba(254, 243, 199, 0.35) 100%);
+  border: 1.5px solid rgba(212, 13, 20, 0.3);
+  box-shadow: 0 4px 20px -4px rgba(212, 13, 20, 0.08);
+}
+
+.dafi-digital-seal {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 2px dashed #D40D14;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(254, 242, 242, 0.6);
+  user-select: none;
+}
+
+
+/* Watermark Keamanan Dokumen Internal */
+.internal-doc-watermark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  opacity: 0.085;
+  transform: rotate(-24deg) scale(1.15);
+  user-select: none;
+}
+.watermark-line {
+  white-space: nowrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 800;
+  color: #D40D14;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+/* Stempel Resmi Sekolah DAFI */
+.dafi-official-stamp {
+  display: inline-block;
+  transform: rotate(-7deg);
+  opacity: 0.90;
+  filter: drop-shadow(0 2px 5px rgba(212, 13, 20, 0.25));
+  transition: transform 0.2s ease;
+}
+.dafi-official-stamp:hover {
+  transform: rotate(-4deg) scale(1.02);
+}
+
+/* Pin / Favorit Dokumen */
+.star-btn {
+  color: #D6D3D1;
+  transition: all 0.15s ease;
+}
+.star-btn:hover {
+  color: #F59E0B;
+  transform: scale(1.15);
+}
+.star-btn.active-star {
+  color: #F59E0B;
+}
+
+/* Canvas Tanda Tangan */
+#signatureCanvas {
+  touch-action: none;
+  cursor: crosshair;
+  background: #FFFFFF;
+}
+
+/* Notifikasi Akun */
+.notification-item.unread {
+  background-color: #FEF2F2;
+  border-left: 3px solid #D40D14;
+}
+.notification-item {
+  transition: background-color 0.15s ease;
+}
+.notification-item:hover {
+  background-color: #F9F9F8;
+}

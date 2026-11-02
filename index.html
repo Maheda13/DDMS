@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DDMS - DAFI Document Management System | SMP DAFI</title>
+  <title>eArchive SMP DAFI - Sistem Manajemen Dokumen</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,59 +16,210 @@
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
   <!-- ===================================================================== -->
-  <!-- MINIMAL CLOUD WORKSPACE HEADER                                        -->
+  <!-- MINIMAL WORKSPACE HEADER                                              -->
   <!-- ===================================================================== -->
-  <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30">
+  <header class="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-30 shadow-2xs">
     <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-wrap items-center justify-between py-3 gap-3">
+      <div class="flex flex-wrap sm:flex-nowrap items-center justify-between py-2 sm:py-2.5 gap-y-2 gap-x-3">
         <!-- Brand Identity -->
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-[#3B66F5] flex items-center justify-center text-white shadow-md shadow-blue-500/25 shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-            </svg>
-          </div>
-          <div>
+        <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 order-1">
+          <img src="dafi-logo.jpg" alt="Logo SMP Islam Terpadu Darul Fikri" class="w-9 h-9 sm:w-10 sm:h-10 object-contain rounded-xl bg-white p-1 border border-stone-200 shadow-xs shrink-0">
+          <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-extrabold text-base sm:text-lg tracking-tight text-slate-800">DDMS - DAFI Document Management System</span>
-              <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#3B66F5] border border-blue-200">SMP DAFI Cloud</span>
+              <span class="font-extrabold text-sm sm:text-base tracking-tight text-stone-900 truncate">eArchive SMP DAFI</span>
+              <span class="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-[#D40D14] border border-red-200 shrink-0">Arsip Digital</span>
             </div>
-            <p class="text-xs text-slate-400">Public Share Library • Tata Tertib, SOP, SK &amp; Surat Administratif Pendidik</p>
+            <p class="text-[11px] sm:text-xs text-stone-500 font-medium">Sistem Manajemen Dokumen</p>
           </div>
         </div>
 
-        <!-- Navigation Pills & User Controls -->
-        <div class="flex items-center gap-2 flex-wrap">
-          <nav class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/70 overflow-x-auto">
-            <button type="button" onclick="switchMainTab('catalog')" id="tabBtn-catalog" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-[#3B66F5] shadow-xs whitespace-nowrap flex items-center gap-1.5 transition">
-              <span>Katalog Dokumen PDF</span>
-              <span id="navCountDocs" class="px-1.5 py-0.2 text-[10px] rounded-full bg-blue-50 text-[#3B66F5]">0</span>
-            </button>
-
-            <button type="button" onclick="switchMainTab('smart')" id="tabBtn-smart" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 whitespace-nowrap flex items-center gap-1.5 transition">
-              <span>Fitur Pintar &amp; Saran Dokumen</span>
-              <span id="navCountSmart" class="px-1.5 py-0.2 text-[10px] rounded-full bg-amber-100 text-amber-700 font-bold">0 Perlu Ditambah</span>
-            </button>
-
-            <button type="button" onclick="switchMainTab('history')" id="tabBtn-history" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 whitespace-nowrap transition">
-              <span>Riwayat Pembaruan Dokumen</span>
-            </button>
-
-            <button type="button" onclick="switchMainTab('gas')" id="tabBtn-gas" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 whitespace-nowrap transition">
-              <span>Integrasi GAS &amp; GitHub Pages</span>
-            </button>
-          </nav>
-
-          <button type="button" onclick="switchMainTab('gas')" id="gasConnectionBadge" class="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200/70 text-slate-600 transition">
-            <span id="gasStatusDot" class="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span id="gasStatusText">Mode: Database Lokal (Siap Konek GAS)</span>
+        <!-- Main Navigation Tabs (Icon-only dengan label dinamis khusus tab aktif) -->
+        <nav id="desktopNavTabs" class="order-3 sm:order-2 w-full sm:w-auto flex items-center justify-start sm:justify-center gap-1 bg-stone-100/90 p-1 rounded-2xl border border-stone-200/90 overflow-x-auto custom-scrollbar" aria-label="Navigasi Utama">
+          <!-- Katalog Dokumen (Aktif secara default) -->
+          <button type="button" onclick="switchMainTab('catalog')" id="tabBtn-catalog" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-[#D40D14] border border-stone-200 shadow-2xs whitespace-nowrap flex items-center gap-1.5 transition-all duration-200 cursor-pointer" title="Katalog Dokumen" aria-label="Katalog Dokumen">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span class="tab-label">Katalog Dokumen</span>
           </button>
 
-          <div id="authHeaderArea" class="flex items-center gap-2"></div>
+          <!-- Target Standar (Icon only saat nonaktif) -->
+          <button type="button" onclick="switchMainTab('smart')" id="tabBtn-smart" class="hidden p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-200/70 whitespace-nowrap flex items-center justify-center transition-all duration-200 cursor-pointer" title="Target Standar Dokumen" aria-label="Target Standar Dokumen">
+            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            <span class="tab-label hidden">Target Standar</span>
+          </button>
+
+          <!-- Riwayat Versi (Icon only saat nonaktif) -->
+          <button type="button" onclick="switchMainTab('history')" id="tabBtn-history" class="hidden p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-200/70 whitespace-nowrap flex items-center justify-center transition-all duration-200 cursor-pointer" title="Riwayat Versi Dokumen" aria-label="Riwayat Versi Dokumen">
+            <svg class="w-4 h-4 text-stone-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="tab-label hidden">Riwayat Versi</span>
+          </button>
+
+          <!-- Rekap Unit (Halaman Biasa - Icon only saat nonaktif) -->
+          <button type="button" onclick="switchMainTab('rekap')" id="tabBtn-rekap" class="hidden p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-200/70 whitespace-nowrap flex items-center justify-center transition-all duration-200 cursor-pointer" title="Rekapitulasi Kesiapan Unit & Akreditasi" aria-label="Rekap Unit">
+            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <span class="tab-label hidden">Rekap Unit</span>
+          </button>
+
+          <!-- Web Setting (Admin - Icon only saat nonaktif) -->
+          <button type="button" onclick="switchMainTab('gas')" id="tabBtn-gas" class="hidden p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-200/70 whitespace-nowrap flex items-center justify-center transition-all duration-200 cursor-pointer" title="Web Setting & Manajemen Pengguna (Khusus Admin)" aria-label="Web Setting">
+            <svg class="w-4 h-4 text-stone-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="tab-label hidden">Web Setting</span>
+          </button>
+        </nav>
+
+        <!-- Controls: Notification + Profile/Login -->
+        <div class="flex items-center gap-2 sm:gap-2.5 shrink-0 order-2 lg:order-3">
+          <!-- GAS Status Dot Badge (Khusus Akun Admin) -->
+          <button type="button" onclick="switchMainTab('gas')" id="gasConnectionBadge" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-600 transition" title="Web Setting & Status Backend (Admin)">
+            <span id="gasStatusDot" class="w-2 h-2 rounded-full bg-amber-500"></span>
+            <span id="gasStatusText">Lokal</span>
+          </button>
+
+          <!-- Notification Bell Button & Popover (Khusus Akun Terdaftar) -->
+          <div id="notificationDropdownContainer" class="relative hidden">
+            <button type="button" id="notificationBellBtn" onclick="toggleNotificationDropdown()" class="relative p-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer border border-stone-200 shadow-2xs" aria-label="Notifikasi Akun" title="Pusat Notifikasi">
+              <svg class="w-5 h-5 text-stone-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span id="notificationBadge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#D40D14] text-white text-[10px] font-bold flex items-center justify-center border-2 border-white shadow-xs">0</span>
+            </button>
+
+            <!-- Dropdown Panel Notifikasi -->
+            <div id="notificationDropdownPanel" class="hidden absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm sm:w-96 bg-white rounded-2xl shadow-2xl border border-stone-200 z-50 overflow-hidden text-stone-800">
+              <div class="p-3.5 bg-stone-50 border-b border-stone-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-stone-900">Notifikasi Akun</span>
+                  <span id="notifPanelUnreadBadge" class="px-2 py-0.2 rounded-full bg-red-100 text-[#D40D14] text-[10px] font-bold">0 Baru</span>
+                </div>
+                <button type="button" onclick="markAllNotificationsAsRead()" class="text-[11px] font-semibold text-[#D40D14] hover:underline cursor-pointer">Tandai Dibaca</button>
+              </div>
+              <div id="notificationListContainer" class="max-h-80 overflow-y-auto divide-y divide-stone-100 custom-scrollbar"></div>
+              <div class="p-2.5 bg-stone-50 border-t border-stone-100 text-center">
+                <span class="text-[10px] text-stone-400">Pemberitahuan alur persetujuan &amp; status dokumen DAFI</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile / Login Menu Area (Dynamically populated) -->
+          <div id="authHeaderArea" class="flex items-center"></div>
         </div>
       </div>
     </div>
   </header>
+
+
+
+  <!-- ===================================================================== -->
+  <!-- MODAL PROFIL PENGGUNA & KELUAR                                        -->
+  <!-- ===================================================================== -->
+  <div id="profileModal" class="hidden fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-stone-200">
+      <!-- Header Profil dengan Warna DAFI Red -->
+      <div class="bg-[#D40D14] p-5 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="profileModalAvatar" class="w-12 h-12 rounded-full bg-white text-[#D40D14] font-black text-lg flex items-center justify-center shadow-md shrink-0">
+            U
+          </div>
+          <div class="min-w-0">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-red-100">Profil Pengguna</span>
+            <h3 id="profileModalName" class="text-base sm:text-lg font-bold leading-tight truncate">Nama Pengguna</h3>
+            <p id="profileModalRoleBadge" class="text-xs text-red-100 font-medium truncate">Jabatan</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeProfileModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" title="Tutup" aria-label="Tutup">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Detail Pengguna -->
+      <div class="p-5 space-y-4">
+        <div class="bg-stone-50 rounded-xl p-3.5 border border-stone-200/80 space-y-2.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-stone-400 font-medium">Username</span>
+            <span id="profileModalUsername" class="font-bold text-stone-800">@username</span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-stone-400 font-medium">Jabatan</span>
+            <span id="profileModalJabatan" class="font-bold text-stone-800">Jabatan</span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-stone-400 font-medium">Hak Akses</span>
+            <span id="profileModalRoleDesc" class="font-bold text-[#D40D14]">Akses Penuh</span>
+          </div>
+          <div class="flex items-center justify-between text-xs pt-2 border-t border-stone-200/60">
+            <span class="text-stone-400 font-medium">Status Sesi</span>
+            <span class="inline-flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 text-[11px]">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Aktif
+            </span>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi Profil -->
+        <div class="space-y-2 pt-1">
+          <button type="button" onclick="closeProfileModal(); openChangePasswordModal();" class="w-full py-2.5 px-4 rounded-xl border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center justify-center gap-2 transition">
+            <svg class="w-4 h-4 text-stone-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+            </svg>
+            <span>Ganti Kata Sandi</span>
+          </button>
+
+          <!-- Tombol Logout Merah -->
+          <button type="button" onclick="closeProfileModal(); handleLogout();" class="w-full py-2.5 px-4 rounded-xl bg-red-50 hover:bg-red-100 text-[#D40D14] border border-red-200 text-xs font-bold flex items-center justify-center gap-2 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            <span>Keluar dari Akun (Logout)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: GANTI KATA SANDI PENGGUNA                                      -->
+  <!-- ===================================================================== -->
+  <div id="changePasswordModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200">
+      <div class="bg-[#D40D14] p-5 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold">Ganti Kata Sandi</h3>
+            <p id="changePasswordUserLabel" class="text-xs text-red-100">Akun Pengguna</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeChangePasswordModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" aria-label="Tutup" title="Tutup">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form onsubmit="handleChangePasswordSubmit(event)" class="p-5 space-y-4">
+        <div>
+          <label for="currentPasswordInput" class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Saat Ini *</label>
+          <input type="password" id="currentPasswordInput" required placeholder="Masukkan kata sandi lama" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none">
+        </div>
+
+        <div>
+          <label for="newPasswordInput" class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Baru *</label>
+          <input type="password" id="newPasswordInput" required minlength="6" placeholder="Minimal 6 karakter" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none">
+        </div>
+
+        <div>
+          <label for="confirmNewPasswordInput" class="block text-xs font-semibold text-slate-700 mb-1">Konfirmasi Kata Sandi Baru *</label>
+          <input type="password" id="confirmNewPasswordInput" required minlength="6" placeholder="Ketik ulang kata sandi baru" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none">
+        </div>
+
+        <div id="changePasswordErrorBox" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium"></div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-xs font-semibold text-white shadow-sm transition">Simpan Kata Sandi</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- ===================================================================== -->
   <!-- MAIN WORKSPACE (ADAPTED DIRECTLY FROM REFERENCE UI IMAGE)             -->
@@ -76,45 +227,46 @@
   <main class="flex-1 max-w-[1360px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
     <!-- =================================================================== -->
-    <!-- TAB 1: PUBLIC SHARE LIBRARY (LEFT) + UPLOAD & SHARE CARDS (RIGHT)   -->
+    <!-- TAB 1: KATALOG DOKUMEN (KIRI) + PANEL UNGGAH (KANAN)                -->
     <!-- =================================================================== -->
     <section id="tabPanel-catalog">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
         <!-- =============================================================== -->
-        <!-- LEFT PANEL (8 COLS): PUBLIC SHARE LIBRARY CARD                  -->
+        <!-- LEFT PANEL (12 COLS DEFAULT UNTUK PUBLIK): KATALOG DOKUMEN       -->
         <!-- =============================================================== -->
-        <div class="lg:col-span-8 cloud-card p-6 sm:p-8 space-y-7">
+        <div id="catalogMainCol" class="lg:col-span-12 cloud-card p-6 sm:p-8 space-y-6 transition-all duration-300">
 
-          <!-- Top Library Header Row (Matches Reference Image) -->
+          <!-- Top Library Header Row -->
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div class="flex items-center gap-2">
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Public Share Library</h1>
-                <button type="button" onclick="switchMainTab('smart')" class="text-slate-400 hover:text-[#3B66F5] transition p-1" title="Analisis Kelengkapan Arsip SMP DAFI">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                  </svg>
-                </button>
-                <span id="roleBannerBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Mode Pengunjung Publik</span>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Katalog Dokumen</h1>
+                <span id="roleBannerBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Pengunjung Publik</span>
               </div>
               <p class="text-xs text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
-                <span>2.68 MB</span>
+                <span id="statStorageMb">0 KB</span>
                 <span>|</span>
-                <span>Created By: <strong>SMP DAFI Sidoarjo</strong></span>
-                <span>•</span>
-                <span id="statAccessBreakdown" class="text-slate-400">4 Publik • 2 Internal Pendidik</span>
+                <span>SMP IT Darul Fikri</span>
+                <span>&bull;</span>
+                <span id="statAccessBreakdown" class="text-slate-400">0 Publik &bull; 0 Internal</span>
               </p>
               <p id="roleBannerDesc" class="sr-only">
-                Anda sedang mengakses halaman dengan domain publik.
+                Anda sedang mengakses halaman publik.
               </p>
             </div>
 
             <div class="flex items-center gap-2">
-              <button type="button" id="bannerLoginBtn" onclick="openLoginModal()" class="px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition">
-                Login Pendidik / Admin
+              <!-- Toggle Collapsible Side Panel (Khusus Login) -->
+              <button type="button" id="btnToggleSidePanel" onclick="toggleCatalogSidePanel()" class="hidden px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition items-center gap-1.5" title="Sembunyikan / Tampilkan Panel Samping">
+                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+                <span id="textToggleSide" class="hidden sm:inline">Panel Samping</span>
               </button>
-              <button type="button" onclick="handleOpenUploadModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-white text-xs sm:text-sm font-semibold shadow-md shadow-blue-500/20 transition">
+
+              <!-- Tombol Unggah PDF (Khusus Login Pendidik/Admin) -->
+              <button type="button" id="catalogHeaderUploadBtn" onclick="handleOpenUploadModal()" class="hidden inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-white text-xs sm:text-sm font-semibold shadow-xs shadow-red-600/20 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
@@ -123,122 +275,150 @@
             </div>
           </div>
 
-          <!-- 5 FOLDER CARDS ROW (Exact Adaptation of Top Folder Grid in Reference Image) -->
-          <div class="hidden">
-            <span id="statTotalDocs">6</span>
-            <span id="folderCountTatib">2</span>
-            <span id="statSopTatib">2</span>
-            <span id="statSkSurat">1</span>
-            <span id="folderCountSurat">1</span>
+          <!-- BATCH APPROVAL BAR (KHUSUS KEPALA SEKOLAH) -->
+          <div id="batchApprovalBar" class="hidden p-3.5 rounded-2xl bg-gradient-to-r from-red-50 to-amber-50 border border-red-200/80 flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-3">
+              <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-stone-800">
+                <input type="checkbox" id="batchSelectAllPendingCheck" onchange="toggleSelectAllPending(this.checked)" class="w-4 h-4 rounded border-stone-300 text-[#D40D14] focus:ring-[#D40D14] cursor-pointer">
+                <span>Pilih Semua Dokumen Pending (<span id="batchPendingSelectedCount">0</span> terpilih)</span>
+              </label>
+              <span class="text-xs text-stone-400 hidden sm:inline">•</span>
+              <span class="text-xs text-stone-500 hidden sm:inline">Persetujuan Massal Berkas KBM / SK</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btnBatchApproveKepsek" onclick="handleBatchApproveKepsek()" disabled class="px-4 py-2 rounded-xl bg-[#D40D14] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#B90B12] text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                <span>Sahkan Sekaligus (<span id="batchApproveCountBadge">0</span>)</span>
+              </button>
+            </div>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5" id="categoryPillsContainer">
+
+          <!-- MODERN SEGMENTED CATEGORY PILLS BAR (Hemat Ruang & Responsif di Ponsel) -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1.5 pt-0.5 custom-scrollbar -mx-2 px-2 sm:mx-0 sm:px-0" id="categoryPillsContainer">
             <!-- Folder 1: Semua Kategori -->
-            <button type="button" id="folderBtnAll" onclick="quickFilterCategory('ALL')" data-cat="ALL" data-files-label="(6) Files" class="cat-pill folder-tile active-folder p-4 text-center flex flex-col items-center justify-between group">
-              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
-                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
-                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
-                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
-                </svg>
-              </div>
-              <div class="text-xs font-bold text-slate-700 leading-snug">Semua Kategori</div>
+            <button type="button" id="folderBtnAll" onclick="quickFilterCategory('ALL')" data-cat="ALL" data-files-label="(0) Files" class="cat-pill active-folder shrink-0">
+              <svg class="w-4 h-4 opacity-75" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+              <span>Semua Kategori</span>
+              <span id="statTotalDocs" class="count-badge">0</span>
             </button>
 
-            <!-- Folder 2: Tata Tertib -->
-            <button type="button" id="folderBtnTatib" onclick="quickFilterCategory('Tata Tertib')" data-cat="Tata Tertib" data-files-label="(2) Files" class="cat-pill folder-tile p-4 text-center flex flex-col items-center justify-between group">
-              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
-                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
-                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
-                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
-                </svg>
-              </div>
-              <div class="text-xs font-bold text-slate-700 leading-snug">Tata Tertib</div>
+            <!-- Folder 2: SOP Sekolah -->
+            <button type="button" id="folderBtnSop" onclick="quickFilterCategory('SOP')" data-cat="SOP" data-files-label="(0) Files" class="cat-pill shrink-0">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+              <span>SOP Sekolah</span>
+              <span id="statSopTatib" class="count-badge">0</span>
             </button>
 
-            <!-- Folder 3: SOP Sekolah -->
-            <button type="button" id="folderBtnSop" onclick="quickFilterCategory('SOP')" data-cat="SOP" data-files-label="(2) Files" class="cat-pill folder-tile p-4 text-center flex flex-col items-center justify-between group">
-              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
-                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
-                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
-                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
-                </svg>
-              </div>
-              <div class="text-xs font-bold text-slate-700 leading-snug">SOP Sekolah</div>
+            <!-- Folder 3: Tata Tertib -->
+            <button type="button" id="folderBtnTatib" onclick="quickFilterCategory('Tata Tertib')" data-cat="Tata Tertib" data-files-label="(0) Files" class="cat-pill shrink-0">
+              <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+              <span>Tata Tertib</span>
+              <span id="folderCountTatib" class="count-badge">0</span>
             </button>
 
             <!-- Folder 4: SK (Surat Keputusan) -->
-            <button type="button" id="folderBtnSk" onclick="quickFilterCategory('SK')" data-cat="SK" data-files-label="(1) Files" class="cat-pill folder-tile p-4 text-center flex flex-col items-center justify-between group">
-              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
-                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
-                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
-                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
-                </svg>
-              </div>
-              <div class="text-xs font-bold text-slate-700 leading-snug">SK (Surat Keputusan)</div>
+            <button type="button" id="folderBtnSk" onclick="quickFilterCategory('SK')" data-cat="SK" data-files-label="(0) Files" class="cat-pill shrink-0">
+              <span class="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+              <span>SK (Surat Keputusan)</span>
+              <span id="statSkSurat" class="count-badge">0</span>
             </button>
 
             <!-- Folder 5: Surat Administratif -->
-            <button type="button" id="folderBtnSurat" onclick="quickFilterCategory('Surat Administratif')" data-cat="Surat Administratif" data-files-label="(1) Files" class="cat-pill folder-tile p-4 text-center flex flex-col items-center justify-between group col-span-2 sm:col-span-1">
-              <div class="w-14 h-12 mx-auto mb-2 flex items-center justify-center">
-                <svg class="w-12 h-10" viewBox="0 0 48 40" fill="none">
-                  <path d="M4 8C4 5.79086 5.79086 4 8 4H18.3431C19.404 4 20.4214 4.42143 21.1716 5.17157L24 8H40C42.2091 8 44 9.79086 44 12V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z" fill="#5B86FF"/>
-                  <path d="M4 15C4 13.3431 5.34315 12 7 12H21.5C22.4282 12 23.3285 12.3228 24.0457 12.9135L26.4543 14.897C27.1715 15.4877 28.0718 15.8105 29 15.8105H41C42.6569 15.8105 44 17.1537 44 18.8105V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V15Z" fill="#82A6FF"/>
-                </svg>
-              </div>
-              <div class="text-xs font-bold text-slate-700 leading-snug">Surat Administratif</div>
+            <button type="button" id="folderBtnSurat" onclick="quickFilterCategory('Surat Administratif')" data-cat="Surat Administratif" data-files-label="(0) Files" class="cat-pill shrink-0">
+              <span class="w-2 h-2 rounded-full bg-[#62615F] shrink-0"></span>
+              <span>Surat Administratif</span>
+              <span id="folderCountSurat" class="count-badge">0</span>
+            </button>
+
+            <!-- Folder 6: Menunggu Persetujuan (Approval Workflow - Khusus Login) -->
+            <button type="button" id="folderBtnPending" onclick="quickFilterCategory('PENDING')" data-cat="PENDING" data-files-label="(0) Menunggu" class="hidden cat-pill shrink-0 border-amber-300 hover:border-amber-400">
+              <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0"></span>
+              <span>Menunggu Persetujuan</span>
+              <span id="folderCountPending" class="count-badge bg-amber-100 text-amber-900 font-bold">0</span>
+            </button>
+
+            <!-- Folder 7: Favorit Saya (⭐) -->
+            <button type="button" id="folderBtnFav" onclick="quickFilterCategory('FAVORITES')" data-cat="FAVORITES" data-files-label="(0) Favorit" class="hidden cat-pill shrink-0 border-amber-300 hover:border-amber-400">
+              <svg class="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              <span>Favorit Saya</span>
+              <span id="folderCountFav" class="count-badge bg-amber-100 text-amber-900 font-bold">0</span>
             </button>
           </div>
 
-          <!-- Compact Search & Filter Bar -->
-          <div class="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-100">
-            <div class="relative flex-1 min-w-[220px]">
-              <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-              <input type="text" id="searchInput" oninput="renderCatalog()" placeholder="Cari judul dokumen, nomor SK/SOP, kata kunci, atau pembuat..." class="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200/90 focus:bg-white focus:border-[#3B66F5] outline-none transition">
-              <button type="button" id="clearSearchBtn" onclick="clearSearchAndFilters()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold" title="Bersihkan">
-                ✕
-              </button>
+          <!-- Compact Search & Filter Bar with Keyboard Shortcut Hint -->
+          <div class="space-y-2.5 pt-3 border-t border-slate-100">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+              <!-- Search Bar with Keyboard Hint -->
+              <div class="relative flex-1 min-w-[260px]">
+                <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" id="searchInput" oninput="renderCatalog()" placeholder="🔍 Cari judul, nomor, isi pasal, teks penuh PDF, intisari AI... (Tekan '/' atau Ctrl+K)" class="w-full pl-9 pr-14 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200/90 focus:bg-white focus:border-[#D40D14] focus:ring-2 focus:ring-red-100 outline-none transition">
+                <div class="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <span class="hidden sm:inline text-[10px] font-mono-code px-1.5 py-0.5 rounded bg-slate-200/70 text-slate-500 font-semibold">/</span>
+                  <button type="button" id="clearSearchBtn" onclick="clearSearchAndFilters()" class="hidden text-slate-400 hover:text-slate-600 p-0.5 rounded-md hover:bg-slate-200 transition" title="Bersihkan Pencarian" aria-label="Bersihkan pencarian">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Filter Strip & View Switcher -->
+              <div class="flex items-center gap-1.5 flex-wrap sm:flex-nowrap justify-between lg:justify-end">
+                <select id="filterCreator" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none cursor-pointer hover:bg-slate-100 transition" title="Filter Unit Kerja Pembuat">
+                  <option value="ALL">Semua Unit</option>
+                  <option value="Kepala Sekolah">Kepala Sekolah</option>
+                  <option value="Waka Kurikulum">Waka Kurikulum</option>
+                  <option value="Waka Kesiswaan">Waka Kesiswaan</option>
+                  <option value="Kepala TU">Kepala TU</option>
+                  <option value="Tim Penjaminan Mutu">Tim Penjaminan Mutu</option>
+                </select>
+
+                <select id="filterAccess" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none cursor-pointer hover:bg-slate-100 transition" title="Filter Hak Akses">
+                  <option value="ALL">Semua Akses</option>
+                  <option value="Publik">Publik</option>
+                  <option value="Internal Pendidik">Internal Pendidik</option>
+                </select>
+
+                <select id="filterLifecycle" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none cursor-pointer hover:bg-slate-100 transition" title="Filter Masa Berlaku & Siklus Peninjauan">
+                  <option value="ALL">Semua Siklus</option>
+                  <option value="active">🟢 Aktif Berlaku</option>
+                  <option value="expiring">🟡 Segera Ditinjau</option>
+                  <option value="expired">🔴 Perlu Pembaruan</option>
+                </select>
+
+                <select id="sortOrder" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none cursor-pointer hover:bg-slate-100 transition" title="Urutan Dokumen">
+                  <option value="newest">Terbaru</option>
+                  <option value="title">Judul A-Z</option>
+                  <option value="version">Versi</option>
+                </select>
+
+                <div class="inline-flex rounded-xl bg-slate-100 p-0.5 border border-slate-200/70 shrink-0">
+                  <button type="button" onclick="setViewMode('grid')" id="viewBtnGrid" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs">Kartu</button>
+                  <button type="button" onclick="setViewMode('table')" id="viewBtnTable" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800">Tabel</button>
+                </div>
+              </div>
             </div>
 
-            <div class="flex items-center gap-2 flex-wrap">
-              <select id="filterCreator" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none">
-                <option value="ALL">Semua Unit</option>
-                <option value="Kepala Sekolah">Kepala Sekolah</option>
-                <option value="Waka Kurikulum">Waka Kurikulum</option>
-                <option value="Waka Kesiswaan">Waka Kesiswaan</option>
-                <option value="Kepala TU">Kepala TU</option>
-                <option value="Tim Penjaminan Mutu">Tim Penjaminan Mutu</option>
-              </select>
-
-              <select id="filterAccess" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none">
-                <option value="ALL">Semua Akses</option>
-                <option value="Publik">Publik</option>
-                <option value="Internal Pendidik">Internal Pendidik</option>
-              </select>
-
-              <select id="sortOrder" onchange="renderCatalog()" class="px-2.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200/90 text-slate-600 font-medium outline-none">
-                <option value="newest">Terbaru</option>
-                <option value="title">Judul A-Z</option>
-                <option value="version">Versi</option>
-              </select>
-
-              <div class="inline-flex rounded-xl bg-slate-100 p-0.5 border border-slate-200/70">
-                <button type="button" onclick="setViewMode('grid')" id="viewBtnGrid" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs">Kartu</button>
-                <button type="button" onclick="setViewMode('table')" id="viewBtnTable" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800">Tabel</button>
-              </div>
+            <!-- Active Filter Chips Bar -->
+            <div id="activeFilterTagsContainer" class="hidden flex items-center gap-1.5 flex-wrap text-xs pt-0.5">
+              <span class="text-slate-400 font-medium">Filter Aktif:</span>
+              <div id="activeFilterTagsList" class="flex items-center gap-1.5 flex-wrap"></div>
+              <button type="button" onclick="clearSearchAndFilters()" class="text-[#D40D14] hover:underline font-semibold ml-1 text-xs">Reset Semua</button>
             </div>
           </div>
 
           <!-- Hidden / Compact Smart Completeness Bar -->
-          <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#F5F8FF] border border-[#DCE6FF] text-xs">
+          <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-xs">
             <div class="flex items-center gap-2 text-slate-600">
-              <span class="w-2 h-2 rounded-full bg-[#3B66F5]"></span>
-              <span id="filterResultInfo" class="font-medium">Menampilkan 6 dokumen</span>
-              <span class="text-slate-300">|</span>
-              <span>Kelengkapan Standar Sekolah: <strong id="statSmartCompleteness" class="text-[#3B66F5]">60%</strong> (<span id="statSmartSubtext">4 saran dokumen</span>)</span>
+              <span class="w-2 h-2 rounded-full bg-[#D40D14]"></span>
+              <span id="filterResultInfo" class="font-medium">Menampilkan 0 dokumen</span>
+              <span class="text-slate-300 logged-in-only hidden">|</span>
+              <span class="logged-in-only hidden">Kelengkapan Standar: <strong id="statSmartCompleteness" class="text-[#D40D14]">0%</strong> (<span id="statSmartSubtext">10 saran</span>)</span>
             </div>
-            <button type="button" onclick="switchMainTab('smart')" class="font-semibold text-[#3B66F5] hover:underline shrink-0">
-              Cek Saran Dokumen Belum Ada
+            <button type="button" id="btnCheckSmartDocs" onclick="switchMainTab('smart')" class="font-semibold text-[#D40D14] hover:underline shrink-0 logged-in-only hidden">
+              Cek Saran Dokumen
             </button>
           </div>
 
@@ -248,86 +428,46 @@
         </div>
 
         <!-- =============================================================== -->
-        <!-- RIGHT PANEL (4 COLS): STACKED "UPLOAD FILE" + "SHARE" CARDS     -->
+        <!-- RIGHT PANEL (4 COLS): PANEL UNGGAH BERKAS (KHUSUS LOGIN)        -->
         <!-- =============================================================== -->
-        <div class="lg:col-span-4 space-y-6">
+        <div id="catalogSideCol" class="hidden lg:col-span-4 space-y-6 transition-all duration-300">
 
-          <!-- TOP-RIGHT CARD: "Upload File" (Exact Match to Reference Image) -->
+          <!-- KARTU UNGGAH BERKAS -->
           <div class="cloud-card p-6 space-y-5">
-            <div class="flex items-center justify-between">
-              <h2 class="text-lg font-bold text-slate-800">Upload File</h2>
-              <span class="text-[11px] font-medium text-slate-400">Google Drive + Sheets</span>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-slate-800">Unggah Berkas PDF</h2>
             </div>
 
             <!-- Dashed Dropzone Box -->
             <div class="dropzone-dashed p-5 text-center space-y-3">
-              <div class="w-10 h-10 rounded-full bg-blue-50 text-[#3B66F5] flex items-center justify-center mx-auto">
+              <div class="w-10 h-10 rounded-full bg-red-50 text-[#D40D14] flex items-center justify-center mx-auto">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
               </div>
               <div>
-                <div class="text-sm font-semibold text-slate-700">Drag your files here</div>
-                <p class="text-[11px] text-slate-400 mt-0.5">PDF Tata Tertib, SOP, SK, and Surat formats, up to 15 MB</p>
+                <div class="text-sm font-semibold text-slate-700">Tarik file PDF ke sini</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Format PDF (Maks. 15 MB)</p>
               </div>
               <div>
-                <button type="button" onclick="handleOpenUploadModal()" class="px-5 py-2 rounded-lg bg-[#3B66F5] hover:bg-[#2952D9] text-white text-xs font-semibold shadow-sm shadow-blue-500/20 transition">
-                  Browse Files
+                <button type="button" onclick="handleOpenUploadModal()" class="px-5 py-2 rounded-lg bg-[#D40D14] hover:bg-[#B90B12] text-white text-xs font-semibold shadow-xs shadow-red-600/20 transition">
+                  Pilih File PDF
                 </button>
               </div>
 
-              <!-- Quick Check / Drive URL Bar with '+' Button (Matches Reference Image) -->
+              <!-- Quick Check Bar with '+' Button -->
               <div class="pt-2">
                 <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1 pl-3 shadow-2xs">
-                  <input type="text" id="quickSidebarCheckInput" placeholder="https://drive.google.com/drive/folders/arsip-dafi..." class="w-full text-[11px] text-slate-600 outline-none bg-transparent truncate">
-                  <button type="button" onclick="handleQuickSidebarAction()" class="w-7 h-7 rounded-lg bg-[#3B66F5] hover:bg-[#2952D9] text-white flex items-center justify-center shrink-0 font-bold text-sm transition" title="Cek Duplikasi / Tambah Cepat">
+                  <input type="text" id="quickSidebarCheckInput" placeholder="Ketik judul dokumen cepat..." class="w-full text-[11px] text-slate-600 outline-none bg-transparent truncate">
+                  <button type="button" onclick="handleQuickSidebarAction()" class="w-7 h-7 rounded-lg bg-[#D40D14] hover:bg-[#B90B12] text-white flex items-center justify-center shrink-0 font-bold text-sm transition" title="Tambah Dokumen Baru">
                     +
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Active Upload & Recent Revision Queue Rows (Matches Reference Image) -->
+            <!-- Active Upload & Recent Revision Queue Rows -->
             <div id="sidebarUploadQueue" class="space-y-2.5"></div>
-          </div>
-
-          <!-- BOTTOM-RIGHT CARD: "Share / Detail & Akses Dokumen" (Exact Match to Reference Image) -->
-          <div class="cloud-card p-6 space-y-4">
-            <div>
-              <h2 class="text-base sm:text-lg font-bold text-slate-800 leading-snug">
-                Share &ldquo;<span id="shareCardDocTitle" class="text-[#3B66F5]">Tata Tertib Guru.pdf</span>&rdquo;
-              </h2>
-              <p class="text-xs text-slate-400 mt-0.5">
-                Invite teachers &amp; school leaders to <strong>view, edit,</strong> and <strong>share</strong> official SMP DAFI documents.
-              </p>
-            </div>
-
-            <!-- Input Add Person / Change Access Level -->
-            <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white">
-              <div class="flex items-center gap-2 flex-1 min-w-0">
-                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                </svg>
-                <input type="text" id="shareInviteInput" placeholder="add a teacher, unit, or email..." class="w-full text-xs text-slate-700 outline-none bg-transparent">
-              </div>
-              <select id="shareAccessQuickSelect" onchange="handleQuickAccessChange()" class="text-xs font-semibold text-[#3B66F5] bg-transparent outline-none cursor-pointer">
-                <option value="Publik">can view (Publik)</option>
-                <option value="Internal Pendidik">internal only</option>
-              </select>
-            </div>
-
-            <!-- People / Role Access List with Circular Initial Avatars -->
-            <div id="sharePeopleList" class="space-y-3 pt-1"></div>
-
-            <!-- Quick Action Strip for Selected Document -->
-            <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
-              <button type="button" onclick="openSelectedDocViewer()" class="flex-1 py-2 px-3 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-white text-xs font-semibold transition">
-                Baca PDF di Aplikasi
-              </button>
-              <button type="button" onclick="openSelectedDocRevision()" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
-                Revisi Versi
-              </button>
-            </div>
           </div>
 
         </div>
@@ -335,26 +475,26 @@
     </section>
 
     <!-- =================================================================== -->
-    <!-- TAB 2: FITUR PINTAR & SARAN DOKUMEN (SMART GAP ANALYSIS)            -->
+    <!-- TAB 2: FITUR PINTAR & SARAN DOKUMEN                                 -->
     <!-- =================================================================== -->
     <section id="tabPanel-smart" class="hidden space-y-6">
       <div class="cloud-card p-6 sm:p-7">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-100">
           <div class="space-y-1">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-[#3B66F5]">
-              Asisten Pintar DDMS SMP DAFI
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-[#D40D14]">
+              Asisten Dokumen DAFI
             </span>
-            <h2 class="text-xl font-bold text-slate-800">Analisis Kelengkapan &amp; Saran Dokumen Wajib Sekolah</h2>
+            <h2 class="text-xl font-bold text-slate-800">Analisis Kelengkapan Dokumen</h2>
             <p class="text-xs sm:text-sm text-slate-500 max-w-3xl">
-              Mendeteksi dokumen standar SMP DAFI yang belum diunggah serta memeriksa kemiripan dokumen secara otomatis agar tidak terjadi duplikasi berkas PDF.
+              Mendeteksi dokumen standar yang belum diunggah dan mencegah duplikasi berkas PDF.
             </p>
           </div>
           <div class="flex items-center gap-2.5 flex-wrap">
             <button type="button" onclick="openAddStandardModal()" class="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition">
-              + Tambah Target Dokumen Wajib
+              + Tambah Standar
             </button>
-            <button type="button" onclick="handleOpenUploadModal()" class="px-4 py-2 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-xs font-semibold text-white shadow-sm transition">
-              Unggah &amp; Cek Duplikasi
+            <button type="button" onclick="handleOpenUploadModal()" class="px-4 py-2 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-xs font-semibold text-white shadow-sm transition">
+              Unggah PDF
             </button>
           </div>
         </div>
@@ -366,21 +506,21 @@
       <div class="cloud-card p-6 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 class="text-base font-bold text-slate-800">Pengecek Pintar Duplikasi &amp; Kemiripan Dokumen</h3>
-            <p class="text-xs text-slate-400">Ketik rencana judul atau nomor SK/SOP untuk mengecek apakah dokumen sudah ada di penyimpanan SMP DAFI.</p>
+            <h3 class="text-base font-bold text-slate-800">Cek Duplikasi Dokumen</h3>
+            <p class="text-xs text-slate-400">Ketik judul atau nomor dokumen untuk mengecek kemiripan dengan arsip yang ada.</p>
           </div>
-          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-[#3B66F5]">Aktif Otomatis Saat Upload</span>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-50 text-[#D40D14]">Otomatis Saat Upload</span>
         </div>
-        <input type="text" id="smartCheckInput" oninput="runInteractiveDuplicateCheck()" placeholder="Coba ketik: 'Tata Tertib Guru', 'SOP KBM', atau 'SK Pembagian Tugas'..." class="w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#3B66F5] outline-none">
+        <input type="text" id="smartCheckInput" oninput="runInteractiveDuplicateCheck()" placeholder="Coba ketik: 'Tata Tertib Guru', 'SOP KBM', atau 'SK Pembagian Tugas'..." class="w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#D40D14] outline-none">
         <div id="smartCheckResultBox" class="rounded-xl p-4 bg-slate-50 border border-slate-200/80 text-xs sm:text-sm text-slate-500">
-          Masukkan kata kunci atau rencana judul dokumen di atas untuk melihat analisis kemiripan dengan arsip DDMS SMP DAFI.
+          Masukkan kata kunci atau rencana judul dokumen untuk melihat analisis kemiripan dengan arsip DDMS.
         </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-7 space-y-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-base font-bold text-slate-800">Saran Dokumen yang Perlu Ditambahkan</h3>
+            <h3 class="text-base font-bold text-slate-800">Daftar Saran Dokumen</h3>
             <span id="missingDocsBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">0 Dokumen</span>
           </div>
           <div id="smartMissingList" class="space-y-3"></div>
@@ -388,7 +528,7 @@
 
         <div class="lg:col-span-5 space-y-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-base font-bold text-slate-800">Dokumen Standar yang Sudah Tersedia</h3>
+            <h3 class="text-base font-bold text-slate-800">Dokumen Tersedia</h3>
             <span id="fulfilledDocsBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">0 Terpenuhi</span>
           </div>
           <div id="smartFulfilledList" class="space-y-3"></div>
@@ -397,19 +537,19 @@
     </section>
 
     <!-- =================================================================== -->
-    <!-- TAB 3: RIWAYAT PEMBARUAN DOKUMEN                                    -->
+    <!-- TAB 3: RIWAYAT VERSI DOKUMEN                                        -->
     <!-- =================================================================== -->
     <section id="tabPanel-history" class="hidden space-y-6">
       <div class="cloud-card p-6 sm:p-7">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
           <div>
-            <h2 class="text-xl font-bold text-slate-800">Riwayat Pembaruan &amp; Revisi Dokumen (Version History)</h2>
+            <h2 class="text-xl font-bold text-slate-800">Riwayat Versi Dokumen</h2>
             <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
-              Jejak kronologis seluruh pembaruan versi dokumen Tata Tertib, SOP, SK, dan Surat Administratif di DDMS SMP DAFI.
+              Jejak kronologis pembaruan versi seluruh dokumen di DDMS SMP IT Darul Fikri.
             </p>
           </div>
           <div class="w-full sm:w-64">
-            <select id="historyDocFilter" onchange="renderGlobalHistory()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-[#3B66F5]">
+            <select id="historyDocFilter" onchange="renderGlobalHistory()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-[#D40D14]">
               <option value="ALL">Semua Dokumen</option>
             </select>
           </div>
@@ -419,25 +559,133 @@
     </section>
 
     <!-- =================================================================== -->
-    <!-- TAB 4: INTEGRASI GAS & GITHUB PAGES                                 -->
+    <!-- TAB 4: REKAPITULASI DOKUMEN UNIT KERJA & AKREDITASI                -->
+    <!-- =================================================================== -->
+    <section id="tabPanel-rekap" class="hidden space-y-6">
+      <div id="rekapPageContent" class="space-y-6">
+        <!-- Konten Rekapitulasi diisi secara dinamis oleh renderRekapitulasiPage() di app.js -->
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 5: WEB SETTING & MANAJEMEN PENGGUNA (KHUSUS ADMIN)             -->
     <!-- =================================================================== -->
     <section id="tabPanel-gas" class="hidden space-y-6">
+      <!-- Header Web Setting -->
+      <div class="cloud-card p-6 sm:p-7 space-y-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-[#D40D14]">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+              <span>Panel Administrator</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-800 mt-1">Web Setting &amp; Manajemen Sistem</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Kelola akun pengguna/pendidik, konfigurasi backend Google Apps Script, dan sinkronisasi arsip cloud.
+            </p>
+          </div>
+          <div class="shrink-0 flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl bg-stone-100 text-stone-700 text-xs font-bold border border-stone-200 shadow-2xs">
+              Hak Akses: Admin Sistem
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KARTU 1: MANAJEMEN PENGGUNA (USER MANAGEMENT) -->
+      <div class="cloud-card p-6 sm:p-7 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-stone-100">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base sm:text-lg font-bold text-slate-800">Manajemen Pengguna &amp; Akun Pendidik</h3>
+              <span id="userCountBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700">0 Pengguna</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Tambah, pantau, dan kelola akun guru, tendik, dan pimpinan untuk akses eArchive SMP DAFI.
+            </p>
+          </div>
+          <button type="button" id="btnToggleAddUserForm" onclick="toggleAddUserForm()" class="px-4 py-2 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-2xs self-start sm:self-auto cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            <span id="btnAddUserText">Tambah Pengguna Baru</span>
+          </button>
+        </div>
+
+        <!-- FORM TAMBAH PENGGUNA BARU (TOGGLEABLE) -->
+        <div id="addUserFormContainer" class="hidden p-5 rounded-2xl bg-stone-50 border border-stone-200 space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-stone-200">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-[#D40D14]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+              <span>Formulir Tambah Akun Pengguna</span>
+            </h4>
+            <button type="button" onclick="toggleAddUserForm(false)" class="text-stone-400 hover:text-stone-700 text-xs font-semibold cursor-pointer">Tutup</button>
+          </div>
+          <form id="addUserForm" onsubmit="handleAddUserSubmit(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div>
+                <label for="newUserUsername" class="block text-xs font-semibold text-stone-700 mb-1">Username Login <span class="text-[#D40D14]">*</span></label>
+                <input type="text" id="newUserUsername" placeholder="cth: ustadz.ahmad" required class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-stone-200 focus:border-[#D40D14] outline-none">
+                <span class="text-[10px] text-stone-400">Huruf kecil, tanpa spasi</span>
+              </div>
+              <div>
+                <label for="newUserFullName" class="block text-xs font-semibold text-stone-700 mb-1">Nama Lengkap &amp; Gelar <span class="text-[#D40D14]">*</span></label>
+                <input type="text" id="newUserFullName" placeholder="cth: Ahmad Dahlan, S.Pd." required class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-stone-200 focus:border-[#D40D14] outline-none">
+              </div>
+              <div>
+                <label for="newUserRole" class="block text-xs font-semibold text-stone-700 mb-1">Peran / Hak Akses <span class="text-[#D40D14]">*</span></label>
+                <select id="newUserRole" required class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-stone-200 focus:border-[#D40D14] outline-none">
+                  <option value="guru">Guru / Tenaga Pendidik (Pengajuan Dokumen)</option>
+                  <option value="tendik">Tenaga Kependidikan / TU (Pengajuan Dokumen)</option>
+                  <option value="kepsek">Kepala Sekolah (Pemeriksa &amp; Pengesah TTE)</option>
+                  <option value="admin">Administrator Sistem (Akses Penuh)</option>
+                </select>
+              </div>
+              <div>
+                <label for="newUserJob" class="block text-xs font-semibold text-stone-700 mb-1">Jabatan &amp; Unit Kerja <span class="text-[#D40D14]">*</span></label>
+                <input type="text" id="newUserJob" placeholder="cth: Waka Kurikulum / Guru IPA" required class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-stone-200 focus:border-[#D40D14] outline-none">
+              </div>
+              <div>
+                <label for="newUserPassword" class="block text-xs font-semibold text-stone-700 mb-1">Kata Sandi Awal <span class="text-[#D40D14]">*</span></label>
+                <div class="relative">
+                  <input type="text" id="newUserPassword" value="dafi2026" required class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-stone-200 focus:border-[#D40D14] outline-none font-mono">
+                  <button type="button" onclick="generateRandomUserPassword()" class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-stone-500 hover:text-stone-800 font-bold px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 cursor-pointer" title="Buat sandi acak baru">Acak</button>
+                </div>
+                <span class="text-[10px] text-stone-400">Pengguna dapat mengganti kata sandi setelah login</span>
+              </div>
+              <div class="flex items-end gap-2">
+                <button type="submit" class="flex-1 py-2 px-4 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-white text-xs font-bold transition shadow-xs cursor-pointer">
+                  Simpan Pengguna
+                </button>
+                <button type="button" onclick="toggleAddUserForm(false)" class="py-2 px-3 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold transition cursor-pointer">
+                  Batal
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- TABEL DAFTAR PENGGUNA TERDAFTAR -->
+        <div id="userManagementTableContainer" class="rounded-2xl border border-stone-200 overflow-x-auto">
+          <!-- Populated by renderUserManagementTable() -->
+        </div>
+      </div>
+
+      <!-- KARTU 2: INTEGRASI BACKEND GOOGLE APPS SCRIPT -->
       <div class="cloud-card p-6 sm:p-7 space-y-4">
         <div>
-          <span class="text-xs font-semibold text-[#3B66F5]">Konfigurasi Endpoint Cloud</span>
-          <h2 class="text-xl font-bold text-slate-800">Hubungkan GitHub Pages dengan Google Apps Script (GAS)</h2>
+          <span class="text-xs font-semibold text-[#D40D14]">Konfigurasi Cloud</span>
+          <h3 class="text-base sm:text-lg font-bold text-slate-800">Koneksi Backend Apps Script</h3>
           <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Domain GitHub Pages Anda bersifat tetap. Saat script GAS diperbarui, cukup tempelkan URL Web App GAS di bawah ini.
+            Tempelkan URL Web App Google Apps Script untuk menghubungkan antarmuka ke pangkalan data cloud.
           </p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
           <div class="lg:col-span-9">
-            <label for="gasUrlInput" class="block text-xs font-semibold text-slate-600 mb-1">URL Web App Google Apps Script (`https://script.google.com/macros/s/.../exec`)</label>
-            <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/AKfycbx.../exec" class="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#3B66F5] outline-none font-mono-code">
+            <label for="gasUrlInput" class="block text-xs font-semibold text-slate-600 mb-1">URL Web App Google Apps Script (<code>https://script.google.com/macros/s/.../exec</code>)</label>
+            <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/AKfycbx.../exec" class="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#D40D14] outline-none font-mono-code">
           </div>
           <div class="lg:col-span-3 flex items-end">
-            <button type="button" onclick="saveAndTestGasUrl()" class="w-full py-2.5 px-4 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-white font-semibold text-xs sm:text-sm transition">
+            <button type="button" onclick="saveAndTestGasUrl()" class="w-full py-2.5 px-4 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-white font-semibold text-xs sm:text-sm transition cursor-pointer">
               Simpan &amp; Sinkronkan
             </button>
           </div>
@@ -446,29 +694,29 @@
         <div class="flex flex-wrap items-center justify-between gap-2 pt-2 text-xs text-slate-400">
           <span id="gasSavedStatusNote">Saat URL dikosongkan, aplikasi berjalan dalam Mode Database Lokal (tersimpan di browser) untuk demonstrasi penuh.</span>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="syncFromGasBackend()" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 font-medium">Muat Ulang dari GAS</button>
-            <button type="button" onclick="resetDemoDatabase()" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 font-medium">Reset Data Sampel SMP DAFI</button>
+            <button type="button" onclick="syncFromGasBackend()" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 font-medium transition cursor-pointer">Muat Ulang dari GAS</button>
+            <button type="button" onclick="resetDemoDatabase()" class="px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 text-red-600 font-medium transition cursor-pointer" title="Kosongkan katalog dokumen lokal browser">Kosongkan Arsip Lokal</button>
           </div>
         </div>
       </div>
 
-      <!-- KARTU SINKRONISASI MASSAL DARI GOOGLE DRIVE -->
+      <!-- KARTU 3: SINKRONISASI MASSAL DARI GOOGLE DRIVE -->
       <div class="cloud-card p-6 sm:p-7 space-y-4 border-2 border-emerald-100 bg-linear-to-r from-emerald-50/40 via-white to-blue-50/30">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-              Fitur Massal Google Drive
+              Pindai Folder Drive
             </div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-800 mt-1">Pindai &amp; Daftarkan Massal PDF yang Sudah Ada di Google Drive</h3>
+            <h3 class="text-base sm:text-lg font-bold text-slate-800 mt-1">Sinkronisasi Massal Folder Drive</h3>
             <p class="text-xs sm:text-sm text-slate-500 mt-0.5 max-w-2xl leading-relaxed">
-              Jika Anda sudah mengunggah banyak berkas PDF secara manual ke folder Drive (<code class="px-1.5 py-0.2 bg-slate-100 text-slate-800 font-mono-code rounded font-semibold">Arsip_PDF_SMP_DAFI</code>), jalankan pemindaian otomatis ini untuk mencatat seluruh arsip ke dalam database Google Sheets tanpa perlu upload satu per satu.
+              Pindai berkas PDF pada folder Drive (<code class="px-1.5 py-0.2 bg-slate-100 text-slate-800 font-mono-code rounded font-semibold">Arsip_PDF_SMP_DAFI</code>) untuk mencatatnya otomatis ke dalam katalog dokumen.
             </p>
           </div>
           <div class="shrink-0 flex flex-col sm:flex-row gap-2">
-            <button type="button" id="btnScanDriveFolder" onclick="triggerScanDriveFolder()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-xs transition flex items-center gap-2 justify-center">
+            <button type="button" id="btnScanDriveFolder" onclick="triggerScanDriveFolder()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-xs transition flex items-center gap-2 justify-center cursor-pointer">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              <span>🔍 Pindai &amp; Daftarkan dari Drive</span>
+              <span>Pindai Folder Drive</span>
             </button>
           </div>
         </div>
@@ -476,25 +724,26 @@
         <div id="driveScanResultBox" class="hidden p-4 rounded-xl border text-xs sm:text-sm space-y-1"></div>
       </div>
 
+      <!-- KARTU 4: PANDUAN PEMASANGAN & SERVER CODE.GS -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-5 cloud-card p-6 space-y-4">
-          <h3 class="text-base font-bold text-slate-800">Langkah Pemasangan DDMS SMP DAFI</h3>
+          <h3 class="text-base font-bold text-slate-800">Langkah Pemasangan eArchive SMP DAFI</h3>
           <ol class="space-y-3 text-xs sm:text-sm text-slate-600 list-decimal list-inside leading-relaxed">
             <li><strong>Buat Google Sheets:</strong> Beri nama <code class="px-1.5 py-0.5 bg-slate-100 rounded text-slate-800">Database DDMS SMP DAFI</code>.</li>
             <li><strong>Pasang Kode GAS:</strong> Buka <strong>Ekstensi &gt; Apps Script</strong>, lalu tempel kode <code class="px-1.5 py-0.5 bg-slate-100 rounded">Code.gs</code> di samping.</li>
-            <li><strong>Inisialisasi:</strong> Jalankan fungsi <code class="px-1.5 py-0.5 bg-blue-50 text-[#3B66F5] font-mono-code">setupDatabase</code> sekali dari editor Apps Script.</li>
+            <li><strong>Inisialisasi:</strong> Jalankan fungsi <code class="px-1.5 py-0.5 bg-red-50 text-[#D40D14] font-mono-code">setupDatabase</code> sekali dari editor Apps Script.</li>
             <li><strong>Deploy Web App:</strong> Pilih <strong>Terapkan &gt; Deployment baru &gt; Aplikasi Web</strong> (<em>Execute as: Me</em>, <em>Who has access: Anyone</em>), lalu salin URL Web App yang berakhiran <code class="px-1.5 py-0.5 bg-slate-100 rounded">/exec</code>.</li>
-            <li><strong>Hubungkan ke GitHub Pages:</strong> Buka berkas <code class="px-1.5 py-0.5 bg-slate-100 rounded">gas-code.js</code>, tempel URL Web App pada <code class="px-1.5 py-0.5 bg-blue-50 text-[#3B66F5] font-mono-code">DEFAULT_WEB_APP_URL</code> (atau tempelkan langsung pada kolom di atas lalu klik <strong>Simpan &amp; Uji Koneksi</strong>).</li>
+            <li><strong>Hubungkan ke Antarmuka:</strong> Tempelkan URL Web App pada kolom di atas lalu klik <strong>Simpan &amp; Sinkronkan</strong>.</li>
           </ol>
         </div>
 
         <div class="lg:col-span-7 bg-slate-900 rounded-2xl p-5 shadow-md flex flex-col">
           <div class="flex items-center justify-between pb-3 border-b border-slate-800">
             <div>
-              <span class="text-xs font-mono-code text-blue-400">Code.gs — Google Apps Script Backend</span>
-              <h3 class="text-sm font-bold text-white">Kode Server Otomatis (Google Sheets + Google Drive PDF)</h3>
+              <span class="text-xs font-mono-code text-red-400">Code.gs</span>
+              <h3 class="text-sm font-bold text-white">Kode Server Backend (Code.gs)</h3>
             </div>
-            <button type="button" onclick="copyGasCode()" class="px-3 py-1.5 rounded-lg bg-[#3B66F5] hover:bg-[#2952D9] text-white text-xs font-semibold transition">
+            <button type="button" onclick="copyGasCode()" class="px-3 py-1.5 rounded-lg bg-[#D40D14] hover:bg-[#B90B12] text-white text-xs font-semibold transition cursor-pointer">
               <span id="copyGasBtnText">Salin Kode Code.gs</span>
             </button>
           </div>
@@ -509,10 +758,10 @@
   <footer class="bg-white/70 border-t border-slate-200/70 mt-10">
     <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
       <div>
-        <strong>DDMS - DAFI Document Management System</strong> • SMP DAFI • Manajemen Dokumen PDF Tata Tertib, SOP, SK &amp; Surat Administratif
+        <strong>DDMS SMP IT Darul Fikri</strong> &bull; Sistem Manajemen Dokumen
       </div>
       <div>
-        Cloud Library UI • GitHub Pages + Google Apps Script
+        Arsip Dokumen Resmi &bull; SMP IT Darul Fikri Sidoarjo
       </div>
     </div>
   </footer>
@@ -524,17 +773,27 @@
     <div class="bg-white rounded-2xl w-full max-w-6xl h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
       <div class="bg-slate-900 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-3 shrink-0">
         <div class="flex items-center gap-3 min-w-0">
-          <span id="viewerDocCategoryBadge" class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30 shrink-0">SOP</span>
+          <span id="viewerDocCategoryBadge" class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-red-500/20 text-red-300 border border-red-400/30 shrink-0">SOP</span>
           <div class="min-w-0">
             <h3 id="viewerDocTitle" class="text-sm sm:text-base font-bold truncate">Judul Dokumen</h3>
-            <p id="viewerDocSubtitle" class="text-xs text-slate-400 truncate">Nomor Dokumen • Pembuat</p>
+            <p id="viewerDocSubtitle" class="text-xs text-slate-400 truncate">Nomor Dokumen &bull; Pembuat</p>
           </div>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
+          <button type="button" onclick="copyCurrentViewerWaShare()" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition flex items-center gap-1.5 shadow-xs" title="Salin Ringkasan Format WhatsApp">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+            <span class="hidden sm:inline">Salin Teks WA</span>
+          </button>
+
+          <button type="button" id="btnToggleViewerFocus" onclick="toggleViewerFocusMode()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition flex items-center gap-1.5" title="Fokus Baca (Layar Penuh)">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+            <span id="btnToggleViewerFocusText" class="hidden sm:inline">Fokus Baca</span>
+          </button>
+
           <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
             <span class="text-xs text-slate-400">Versi:</span>
-            <select id="viewerVersionSelect" onchange="handleViewerVersionChange()" class="bg-transparent text-xs font-semibold text-blue-300 outline-none cursor-pointer"></select>
+            <select id="viewerVersionSelect" onchange="handleViewerVersionChange()" class="bg-transparent text-xs font-semibold text-red-300 outline-none cursor-pointer"></select>
           </div>
 
           <div class="hidden sm:flex items-center bg-slate-800 rounded-lg border border-slate-700 p-0.5">
@@ -543,21 +802,22 @@
             <button type="button" onclick="adjustPdfZoom(0.1)" class="px-2 py-1 text-xs hover:bg-slate-700 rounded text-slate-200" title="Perbesar">+</button>
           </div>
 
-          <button type="button" onclick="printCurrentPdf()" class="px-3 py-1.5 rounded-lg bg-[#3B66F5] hover:bg-[#2952D9] text-xs font-semibold text-white transition">
-            <span>Cetak / Simpan PDF</span>
+          <button type="button" onclick="printCurrentPdf()" class="px-3 py-1.5 rounded-lg bg-[#D40D14] hover:bg-[#B90B12] text-xs font-semibold text-white transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span class="hidden sm:inline">Cetak PDF</span>
           </button>
 
-          <button type="button" onclick="closePdfViewerModal()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition" title="Tutup">
-            [TUTUP]
+          <button type="button" onclick="closePdfViewerModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition" title="Tutup Pratinjau" aria-label="Tutup">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
       </div>
 
       <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden bg-slate-100">
-        <div class="lg:col-span-8 h-full overflow-y-auto p-3 sm:p-6 flex flex-col items-center custom-scrollbar" id="pdfCanvasScrollContainer">
-          <div id="externalPdfNotice" class="hidden w-full max-w-3xl mb-3 p-3 rounded-xl bg-[#3B66F5] text-white text-xs flex items-center justify-between gap-2">
-            <span id="externalPdfNoticeText">Menampilkan file PDF asli yang diunggah / terhubung ke Google Drive.</span>
-            <a id="externalPdfDirectLink" href="https://drive.google.com" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-white text-[#3B66F5] font-semibold shrink-0">Buka Tab Baru</a>
+        <div id="viewerDocPane" class="lg:col-span-8 h-full overflow-y-auto p-3 sm:p-6 flex flex-col items-center custom-scrollbar transition-all">
+          <div id="externalPdfNotice" class="hidden w-full max-w-3xl mb-3 p-3 rounded-xl bg-[#D40D14] text-white text-xs flex items-center justify-between gap-2">
+            <span id="externalPdfNoticeText">Menampilkan file PDF resmi.</span>
+            <a id="externalPdfDirectLink" href="https://drive.google.com" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-white text-[#D40D14] font-semibold shrink-0">Buka Tab Baru</a>
           </div>
 
           <iframe id="nativePdfIframe" title="Pratinjau Dokumen PDF" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" class="hidden w-full h-full min-h-[520px] rounded-xl bg-white border border-slate-300 shadow"></iframe>
@@ -565,10 +825,10 @@
           <div id="printablePdfArea" class="pdf-page-sheet w-full max-w-3xl rounded-xl p-6 sm:p-10 text-slate-900 space-y-6"></div>
         </div>
 
-        <div class="lg:col-span-4 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 h-full overflow-y-auto p-4 sm:p-5 space-y-5 custom-scrollbar">
+        <div id="viewerMetaPane" class="lg:col-span-4 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 h-full overflow-y-auto p-4 sm:p-5 space-y-5 custom-scrollbar transition-all">
           <div class="flex items-center justify-between">
             <h4 class="text-sm font-bold text-slate-800">Informasi &amp; Metadata Dokumen</h4>
-            <button type="button" id="viewerUpdateVersionBtn" onclick="openUpdateFromViewer()" class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#3B66F5] text-xs font-semibold border border-blue-200 transition">
+            <button type="button" id="viewerUpdateVersionBtn" onclick="openUpdateFromViewer()" class="hidden px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-[#D40D14] text-xs font-semibold border border-red-200 transition">
               + Unggah Versi Baru
             </button>
           </div>
@@ -588,17 +848,63 @@
   </div>
 
   <!-- ===================================================================== -->
+  <!-- MODAL: SERTIFIKAT VERIFIKASI KEABSAHAN TTE RESMI (PUBLIC SCAN/VERIFY) -->
+  <!-- ===================================================================== -->
+  <div id="signatureVerificationModal" class="hidden fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl w-full max-w-xl max-h-[94vh] flex flex-col shadow-2xl overflow-hidden border border-stone-200">
+      
+      <!-- Header Sertifikat -->
+      <div class="px-5 py-4 bg-linear-to-r from-[#B90B12] via-[#D40D14] to-[#96090E] text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-xs shrink-0">
+            <img src="dafi-logo.jpg" alt="Logo DAFI" class="w-full h-full object-contain" />
+          </div>
+          <div>
+            <h3 class="text-sm sm:text-base font-extrabold tracking-tight">Sertifikat Keabsahan Dokumen Elektronik</h3>
+            <p class="text-[11px] text-red-100">Pangkalan Data Resmi SMP IT Darul Fikri Sidoarjo</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeVerificationModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" aria-label="Tutup" title="Tutup">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Isi Sertifikat Modal -->
+      <div id="verificationModalBody" class="p-5 sm:p-6 overflow-y-auto space-y-4 custom-scrollbar text-xs sm:text-sm">
+        <!-- Akan di-render secara dinamis oleh app.js -->
+      </div>
+
+      <!-- Footer Modal -->
+      <div class="px-5 py-3.5 bg-stone-50 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">
+        <button type="button" onclick="closeVerificationModal()" class="px-4 py-2 rounded-xl bg-white hover:bg-stone-100 border border-stone-300 font-bold text-stone-700 text-xs transition">
+          Tutup
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" id="btnVerifPrintCert" class="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-900 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>Cetak Lembar Sertifikat</span>
+          </button>
+          <button type="button" id="btnVerifOpenDoc" class="px-4 py-2 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            <span>Lihat Dokumen Asli</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
   <!-- MODAL 2: UPLOAD FILE PDF & DETEKSI PINTAR DUPLIKASI / KEMIRIPAN       -->
   <!-- ===================================================================== -->
   <div id="uploadModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
       <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
         <div>
-          <span id="uploadModalModeBadge" class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">Unggah Dokumen Baru</span>
-          <h3 id="uploadModalTitle" class="text-base sm:text-lg font-bold mt-0.5">Upload File PDF ke DDMS SMP DAFI</h3>
+          <span id="uploadModalModeBadge" class="text-xs font-semibold px-2 py-0.5 rounded bg-red-500/20 text-red-300">Unggah Dokumen</span>
+          <h3 id="uploadModalTitle" class="text-base sm:text-lg font-bold mt-0.5">Unggah Berkas PDF</h3>
         </div>
-        <button type="button" onclick="closeUploadModal()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300">
-          [X]
+        <button type="button" onclick="closeUploadModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition" aria-label="Tutup" title="Tutup">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
@@ -621,18 +927,18 @@
 
         <!-- AREA 1: UNGGAH TUNGGAL & PERBARUI VERSI -->
         <div id="singleUploadFields" class="space-y-4">
-          <div id="existingDocSelectWrapper" class="hidden p-3.5 rounded-xl bg-blue-50 border border-blue-200 space-y-2">
-            <label for="formSelectExistingDoc" class="block text-xs font-bold text-blue-900">Pilih Dokumen yang Akan Diperbarui Versinya:</label>
-            <select id="formSelectExistingDoc" onchange="populateFormForVersionUpdate()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border border-blue-300 bg-white outline-none"></select>
+          <div id="existingDocSelectWrapper" class="hidden p-3.5 rounded-xl bg-red-50 border border-red-200 space-y-2">
+            <label for="formSelectExistingDoc" class="block text-xs font-bold text-red-950">Pilih Dokumen yang Akan Diperbarui Versinya:</label>
+            <select id="formSelectExistingDoc" onchange="populateFormForVersionUpdate()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border border-red-300 bg-white outline-none"></select>
           </div>
 
           <div id="smartDuplicateAlert" class="hidden p-4 rounded-xl bg-amber-50 border border-amber-300 text-xs space-y-2"></div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1.5">File Dokumen PDF <span class="text-[#3B66F5]">(Maks. 15 MB • Otomatis dikirim ke Google Drive via GAS)</span></label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">File Dokumen PDF <span class="text-slate-400 font-normal">(Maks. 15 MB)</span></label>
             <label for="formPdfFile" class="dropzone-dashed flex flex-col items-center justify-center p-4 cursor-pointer text-center">
-              <span id="selectedFileNameDisplay" class="text-xs sm:text-sm font-semibold text-slate-700">Klik untuk memilih file .PDF dari perangkat Anda</span>
-              <span id="selectedFileSizeDisplay" class="text-xs text-slate-400 mt-0.5">Mendukung pratinjau langsung di aplikasi &amp; konversi Base64 ke Google Drive</span>
+              <span id="selectedFileNameDisplay" class="text-xs sm:text-sm font-semibold text-slate-700">Klik untuk memilih file PDF</span>
+              <span id="selectedFileSizeDisplay" class="text-xs text-slate-400 mt-0.5">Mendukung pratinjau langsung di aplikasi</span>
               <input type="file" id="formPdfFile" accept="application/pdf,.pdf" onchange="handlePdfFileSelected(event)" class="hidden">
             </label>
           </div>
@@ -640,19 +946,19 @@
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
             <div class="sm:col-span-7">
               <label for="formJudul" class="block text-xs font-semibold text-slate-700 mb-1">Judul Dokumen Resmi *</label>
-              <input type="text" id="formJudul" required oninput="checkUploadSimilarityLive()" placeholder="Contoh: SOP Pelaksanaan Supervisi Akademik Guru SMP DAFI" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
+              <input type="text" id="formJudul" required oninput="checkUploadSimilarityLive()" placeholder="Contoh: SOP Pelaksanaan Supervisi Akademik Guru SMP DAFI" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none">
             </div>
             <div class="sm:col-span-5">
               <div class="flex items-center justify-between mb-1">
                 <label for="formNomor" class="block text-xs font-semibold text-slate-700">Nomor Dokumen / SK *</label>
-                <button type="button" onclick="autoGenerateDocNumber()" class="text-[11px] font-semibold text-[#3B66F5] hover:underline">Buat Otomatis</button>
+                <button type="button" onclick="autoGenerateDocNumber()" class="text-[11px] font-semibold text-[#D40D14] hover:underline">Buat Otomatis</button>
               </div>
-              <input type="text" id="formNomor" required oninput="checkUploadSimilarityLive()" placeholder="021/SOP/SMP-DAFI/X/2026" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none font-mono-code">
+              <input type="text" id="formNomor" required oninput="checkUploadSimilarityLive()" placeholder="021/SOP/SMP-DAFI/X/2026" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none font-mono-code">
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div>
+          <div class="grid grid-cols-1 sm:grid-cols-6 gap-3">
+            <div class="sm:col-span-2">
               <label for="formKategori" class="block text-xs font-semibold text-slate-700 mb-1">Kategori *</label>
               <select id="formKategori" onchange="checkUploadSimilarityLive()" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white outline-none">
                 <option value="Tata Tertib">Tata Tertib</option>
@@ -662,7 +968,7 @@
               </select>
             </div>
 
-            <div>
+            <div class="sm:col-span-2">
               <label for="formPembuat" class="block text-xs font-semibold text-slate-700 mb-1">Pembuat / Unit *</label>
               <select id="formPembuat" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white outline-none">
                 <option value="Kepala Sekolah">Kepala Sekolah</option>
@@ -673,7 +979,7 @@
               </select>
             </div>
 
-            <div>
+            <div class="sm:col-span-2">
               <label for="formAkses" class="block text-xs font-semibold text-slate-700 mb-1">Hak Akses *</label>
               <select id="formAkses" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white outline-none">
                 <option value="Publik">Publik (Semua Orang)</option>
@@ -681,28 +987,45 @@
               </select>
             </div>
 
-            <div>
+            <div class="sm:col-span-3">
+              <label for="formMasaBerlaku" class="block text-xs font-semibold text-slate-700 mb-1">Masa Berlaku *</label>
+              <select id="formMasaBerlaku" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white outline-none">
+                <option value="1">1 Tahun Ajaran</option>
+                <option value="2">2 Tahun</option>
+                <option value="3">3 Tahun</option>
+                <option value="99">Berlaku Tetap</option>
+              </select>
+            </div>
+
+            <div class="sm:col-span-3">
               <label for="formVersi" class="block text-xs font-semibold text-slate-700 mb-1">Versi Dokumen *</label>
-              <input type="text" id="formVersi" value="v1.0" required class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none font-mono-code">
+              <input type="text" id="formVersi" value="v1.0" required class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none font-mono-code">
             </div>
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1">
               <label for="formKataKunci" class="block text-xs font-semibold text-slate-700">Kata Kunci Pencarian (Pisahkan dengan koma) *</label>
-              <button type="button" onclick="autoSuggestKeywords()" class="text-[11px] font-semibold text-[#3B66F5] hover:underline">Saran Kata Kunci Pintar</button>
+              <button type="button" onclick="autoSuggestKeywords()" class="text-[11px] font-semibold text-[#D40D14] hover:underline">Saran Kata Kunci Pintar</button>
             </div>
-            <input type="text" id="formKataKunci" required placeholder="supervisi, akademik, kurikulum, guru, evaluasi" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
+            <input type="text" id="formKataKunci" required placeholder="supervisi, akademik, kurikulum, guru, evaluasi" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none">
           </div>
 
           <div>
-            <label for="formRingkasan" class="block text-xs font-semibold text-slate-700 mb-1">Ringkasan Pokok / Isi Dokumen *</label>
-            <textarea id="formRingkasan" rows="3" required placeholder="Tuliskan ringkasan singkat atau poin-poin utama isi dokumen PDF ini..." class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none"></textarea>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="formRingkasan" class="block text-xs font-semibold text-slate-700">Ringkasan Pokok / Isi Dokumen *</label>
+              <button type="button" id="btnAiSummarizeUpload" onclick="generateAiSummaryForUpload()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#D40D14] to-[#B90B12] hover:from-[#B90B12] hover:to-[#96090e] text-white font-semibold text-[11px] shadow-2xs hover:shadow transition transform active:scale-95" title="Analisis otomatis isi dokumen & buat 3 poin intisari dengan AI">
+                <span id="btnAiSummarySpinner" class="hidden animate-spin">⚡</span>
+                <span id="btnAiSummaryIcon">✨</span>
+                <span id="btnAiSummaryText">Ringkas dengan AI</span>
+              </button>
+            </div>
+            <textarea id="formRingkasan" rows="3" required placeholder="Tuliskan ringkasan singkat atau klik 'Ringkas dengan AI' untuk membuat 3 poin terstruktur otomatis..." class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none"></textarea>
           </div>
 
           <div>
             <label for="formCatatanRevisi" class="block text-xs font-semibold text-slate-700 mb-1">Catatan Riwayat Pembaruan (Changelog) *</label>
-            <input type="text" id="formCatatanRevisi" required value="Unggahan dokumen resmi awal (rilis pertama)." class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
+            <input type="text" id="formCatatanRevisi" required value="Unggahan dokumen resmi awal (rilis pertama)." class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none">
           </div>
         </div>
 
@@ -772,7 +1095,7 @@
           <button type="button" onclick="closeUploadModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-50">
             Batal
           </button>
-          <button type="submit" id="submitUploadBtn" class="px-5 py-2 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-xs sm:text-sm font-semibold text-white shadow-sm transition">
+          <button type="submit" id="submitUploadBtn" class="px-5 py-2 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-xs sm:text-sm font-semibold text-white shadow-sm transition">
             Simpan &amp; Publikasikan PDF
           </button>
           <button type="button" id="submitBatchBtn" onclick="handleStartBatchUpload()" class="hidden px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs sm:text-sm font-semibold text-white shadow-sm transition flex items-center gap-1.5">
@@ -789,19 +1112,19 @@
   <!-- ===================================================================== -->
   <div id="loginModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200">
-      <div class="bg-[#3B66F5] p-5 text-white flex items-center justify-between">
+      <div class="bg-[#D40D14] p-5 text-white flex items-center justify-between">
         <div>
-          <span class="text-xs font-semibold uppercase tracking-wider text-blue-100">Autentikasi DDMS</span>
-          <h3 class="text-lg font-bold">Login Tenaga Pendidik SMP DAFI</h3>
+          <span class="text-xs font-semibold uppercase tracking-wider text-red-100">Autentikasi DDMS</span>
+          <h3 class="text-lg font-bold">Login Pendidik</h3>
         </div>
-        <button type="button" onclick="closeLoginModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white">
-          ✕
+        <button type="button" onclick="closeLoginModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" aria-label="Tutup" title="Tutup">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
       <form onsubmit="handleLoginSubmit(event)" class="p-5 space-y-4">
         <p id="loginModalReason" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">
-          Silakan masuk untuk mengakses dokumen berstatus <strong>Internal Pendidik</strong> serta melakukan <strong>Unggah / Pembaruan Versi PDF</strong>.
+          Masuk untuk akses dokumen Internal Pendidik dan kelola arsip PDF.
         </p>
 
         <div class="space-y-1.5">
@@ -809,40 +1132,40 @@
             <span class="block text-xs font-semibold text-slate-500">Pilih Akun Demo (Klik untuk isi cepat):</span>
             <span class="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
               <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              Enkripsi SHA-256 + HMAC
+              Sistem Terverifikasi
             </span>
           </div>
           <div class="grid grid-cols-3 gap-2">
-            <button type="button" onclick="fillDemoCredentials('kepsek', 'dafi2026')" class="p-2.5 rounded-xl border border-slate-200 hover:border-[#3B66F5] hover:bg-blue-50/50 text-left transition">
+            <button type="button" onclick="fillDemoCredentials('kepsek', 'dafi2026')" class="p-2.5 rounded-xl border border-slate-200 hover:border-[#D40D14] hover:bg-red-50/50 text-left transition">
               <div class="text-xs font-bold text-slate-800">Kepala Sekolah</div>
-              <div class="text-[11px] text-[#3B66F5]">Akses Penuh</div>
+              <div class="text-[10px] text-emerald-700 font-semibold">Menyetujui Dokumen</div>
             </button>
-            <button type="button" onclick="fillDemoCredentials('guru', 'guru2026')" class="p-2.5 rounded-xl border border-slate-200 hover:border-[#3B66F5] hover:bg-blue-50/50 text-left transition">
-              <div class="text-xs font-bold text-slate-800">Guru / Pendidik</div>
-              <div class="text-[11px] text-[#3B66F5]">Baca &amp; Upload</div>
+            <button type="button" onclick="fillDemoCredentials('tendik', 'tendik2026')" class="p-2.5 rounded-xl border border-slate-200 hover:border-[#D40D14] hover:bg-red-50/50 text-left transition">
+              <div class="text-xs font-bold text-slate-800">Tendik / Staf</div>
+              <div class="text-[10px] text-[#D40D14] font-semibold">Mengajukan Dokumen</div>
             </button>
-            <button type="button" onclick="fillDemoCredentials('admin', 'admin2026')" class="p-2.5 rounded-xl border border-slate-200 hover:border-[#3B66F5] hover:bg-blue-50/50 text-left transition">
-              <div class="text-xs font-bold text-slate-800">Admin TU</div>
-              <div class="text-[11px] text-[#3B66F5]">Kelola Arsip</div>
+            <button type="button" onclick="fillDemoCredentials('admin', 'admin2026')" class="p-2.5 rounded-xl border border-slate-200 hover:border-[#D40D14] hover:bg-red-50/50 text-left transition">
+              <div class="text-xs font-bold text-slate-800">Admin Sistem</div>
+              <div class="text-[10px] text-blue-700 font-semibold">Pengaturan Sistem</div>
             </button>
           </div>
         </div>
 
         <div>
           <label for="loginUsername" class="block text-xs font-semibold text-slate-700 mb-1">Username</label>
-          <input type="text" id="loginUsername" required placeholder="kepsek / guru / admin" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
+          <input type="text" id="loginUsername" required placeholder="kepsek / tendik / admin" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none">
         </div>
 
         <div>
           <label for="loginPassword" class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi</label>
-          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-[#3B66F5] outline-none">
+          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 focus:border-[#D40D14] outline-none">
         </div>
 
         <div id="loginErrorBox" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium"></div>
 
         <div class="flex items-center justify-end gap-2 pt-2">
           <button type="button" onclick="closeLoginModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">Batal</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-xs font-semibold text-white shadow-sm">Masuk Sekarang</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-xs font-semibold text-white shadow-sm">Masuk Sekarang</button>
         </div>
       </form>
     </div>
@@ -855,7 +1178,9 @@
     <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200">
       <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
         <h3 class="text-base font-bold">Tambah Target Dokumen Wajib Sekolah</h3>
-        <button type="button" onclick="closeAddStandardModal()" class="p-1 rounded-lg bg-slate-800 text-slate-300">✕</button>
+        <button type="button" onclick="closeAddStandardModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition" aria-label="Tutup" title="Tutup">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
       <form onsubmit="handleAddStandardSubmit(event)" class="p-5 space-y-3.5">
         <div>
@@ -893,16 +1218,101 @@
         </div>
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" onclick="closeAddStandardModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">Batal</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-[#3B66F5] hover:bg-[#2952D9] text-xs font-semibold text-white">Tambahkan ke Daftar Saran</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-xs font-semibold text-white">Tambahkan ke Daftar Saran</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- ===================================================================== -->
+  <!-- MODAL: PERSETUJUAN & TTE KEPALA SEKOLAH (DENGAN CANVAS TANDA TANGAN)  -->
+  <!-- ===================================================================== -->
+  <div id="kepsekApprovalModal" class="hidden fixed inset-0 z-50 bg-stone-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-stone-200">
+      <div class="px-5 py-4 bg-[#D40D14] text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <span class="text-[11px] font-bold text-red-100 uppercase tracking-wider">Hak Otoritas Kepala Sekolah</span>
+            <h3 class="text-base font-extrabold">Persetujuan &amp; Pengesahan Dokumen</h3>
+          </div>
+        </div>
+        <button type="button" onclick="closeKepsekApprovalModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" aria-label="Tutup" title="Tutup">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 custom-scrollbar text-xs sm:text-sm">
+        <input type="hidden" id="approvalTargetDocId" value="">
+
+        <!-- Ringkasan Dokumen yang Ditinjau -->
+        <div class="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span id="approvalDocCategoryBadge" class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-red-100 text-[#D40D14]">SOP</span>
+            <span id="approvalDocNomor" class="font-mono text-stone-500 text-xs">001/SOP/DAFI/2026</span>
+          </div>
+          <h4 id="approvalDocTitle" class="text-sm sm:text-base font-extrabold text-stone-900 leading-snug">Judul Dokumen</h4>
+          <p id="approvalDocSummary" class="text-stone-600 text-xs leading-relaxed">Ringkasan singkat isi dokumen...</p>
+          <div class="pt-2 border-t border-stone-200/80 flex items-center justify-between text-xs text-stone-500">
+            <span>Diajukan oleh: <strong id="approvalDocSubmitter" class="text-stone-800">Tendik</strong></span>
+            <span>Versi: <strong id="approvalDocVersion" class="text-stone-800">v1.0</strong></span>
+          </div>
+        </div>
+
+        <!-- Canvas Tanda Tangan Basah Digital & Stempel -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-stone-800">Goreskan Tanda Tangan Basah (Stylus / Jari / Mouse):</label>
+            <button type="button" onclick="clearSignatureCanvas()" class="text-[11px] font-bold text-[#D40D14] hover:underline cursor-pointer">
+              ↺ Bersihkan Goresan
+            </button>
+          </div>
+          <div class="relative rounded-2xl border-2 border-dashed border-stone-300 overflow-hidden bg-stone-50/50">
+            <canvas id="signatureCanvas" width="600" height="160" class="w-full h-36 bg-white block"></canvas>
+            <div class="absolute bottom-2 right-2 pointer-events-none opacity-40">
+              <span class="text-[10px] font-bold text-stone-400">Pad TTE Kepala Sekolah SMP IT DAFI</span>
+            </div>
+          </div>
+          <p class="text-[11px] text-stone-400">
+            * Anda dapat menandatangani langsung di kotak atas, atau sistem akan otomatis menyertakan Tanda Tangan Elektronik Kriptografis (SHA-256) resmi beserta stempel sekolah.
+          </p>
+        </div>
+
+        <!-- Catatan Tambahan atau Arahan Revisi -->
+        <div>
+          <label for="approvalNotesInput" class="block text-xs font-bold text-stone-800 mb-1">Catatan Persetujuan / Arahan Revisi (Opsional):</label>
+          <textarea id="approvalNotesInput" rows="2" placeholder="Tuliskan arahan pelaksanaan atau instruksi revisi untuk staf pengusul..." class="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-stone-200 outline-none focus:border-[#D40D14]"></textarea>
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 bg-stone-50 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">
+        <button type="button" onclick="closeKepsekApprovalModal()" class="px-4 py-2 rounded-xl bg-white hover:bg-stone-100 border border-stone-300 text-stone-700 text-xs font-bold transition">
+          Batal
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="submitKepsekRevision()" class="px-4 py-2 rounded-xl bg-white hover:bg-amber-50 border border-amber-300 text-amber-900 text-xs font-bold transition">
+            ✏️ Minta Revisi
+          </button>
+          <button type="button" onclick="submitKepsekApproval()" class="px-5 py-2 rounded-xl bg-[#D40D14] hover:bg-[#B90B12] text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <span>Setujui &amp; Sahkan Resmi (TTE)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Area Khusus Cetak Lembar Pengesahan / Sertifikat Keabsahan TTE Resmi -->
+  <div id="printableCertificateArea" class="hidden"></div>
+
+  <!-- ===================================================================== -->
   <!-- JAVASCRIPT UTAMA DDMS - DAFI DOCUMENT MANAGEMENT SYSTEM               -->
   <!-- ===================================================================== -->
-    <!-- BERKAS KHUSUS GAS CODE & LOGIKA APLIKASI UTAMA -->
+  <!-- BERKAS KHUSUS GAS CODE & LOGIKA APLIKASI UTAMA -->
   <script src="gas-code.js"></script>
   <script src="app.js"></script>
 </body>
