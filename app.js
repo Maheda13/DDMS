@@ -592,12 +592,13 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
     function isSafePdfUrl(url) {
       if (!url) return false;
       const s = String(url).trim();
-      if (s.startsWith('blob:') || s.startsWith('data:application/pdf;base64,')) return true;
+      if (s.startsWith('blob:') || s.startsWith('data:')) return true;
       try {
         const u = new URL(s);
         return u.protocol === 'https:' && (
           u.hostname === 'drive.google.com' ||
-          u.hostname === 'docs.google.com'
+          u.hostname === 'docs.google.com' ||
+          u.hostname.endsWith('.google.com')
         );
       } catch (e) {
         return false;
@@ -607,7 +608,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
     function sanitizeFileNameClient(name) {
       if (!name) return 'Dokumen_SMP_DAFI.pdf';
       let safe = String(name).replace(/[\/\\:\*\?"<>\|]/g, '_').replace(/[^a-zA-Z0-9_\.\-\s]/g, '');
-      if (!safe.toLowerCase().endsWith('.pdf')) {
+      if (!/\.(pdf|docx|doc|odt|rtf)$/i.test(safe)) {
         safe += '.pdf';
       }
       return safe;
@@ -2857,7 +2858,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
                   </button>
                 ` : `
                   <button type="button" onclick="event.stopPropagation(); openPdfViewer('${escapeHtml(doc.id)}')" class="w-full py-1.5 px-2.5 rounded-lg ${isSelected ? 'bg-[#D40D14] text-white' : 'bg-slate-100 hover:bg-[#D40D14] text-slate-700 hover:text-white'} font-bold text-[11px] transition">
-                    Baca PDF
+                    Buka Dokumen
                   </button>
                 `}
               </div>
@@ -2950,7 +2951,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
                 ${isLocked ? `
                   <button type="button" onclick="event.stopPropagation(); openLoginModal('Silakan login untuk membaca dokumen internal ini.')" class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs">Login</button>
                 ` : `
-                  <button type="button" onclick="event.stopPropagation(); openPdfViewer('${escapeHtml(doc.id)}')" class="px-3 py-1 rounded-lg bg-[#D40D14] text-white font-semibold text-xs">Baca PDF</button>
+                  <button type="button" onclick="event.stopPropagation(); openPdfViewer('${escapeHtml(doc.id)}')" class="px-3 py-1 rounded-lg bg-[#D40D14] text-white font-semibold text-xs">Buka Dokumen</button>
                 `}
               </div>
             </td>
@@ -3094,7 +3095,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
                     ${getFileDocumentSvg(doc.kategori, 'w-7 h-8')}
                   </div>
                   <div class="min-w-0">
-                    <div class="text-xs font-semibold text-slate-700 truncate">${escapeHtml(doc.judul)}.pdf</div>
+                    <div class="text-xs font-semibold text-slate-700 truncate">${escapeHtml(doc.judul)}</div>
                     <div class="text-[10px] text-slate-400">${escapeHtml(doc.ukuran)} &bull; ${escapeHtml(doc.versi)}</div>
                   </div>
                 </div>
@@ -3113,7 +3114,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
                 ${getFileDocumentSvg(doc.kategori, 'w-7 h-8')}
               </div>
               <div class="min-w-0">
-                <div class="text-xs font-semibold text-slate-700 truncate">${escapeHtml(doc.judul)}.pdf</div>
+                <div class="text-xs font-semibold text-slate-700 truncate">${escapeHtml(doc.judul)}</div>
                 <div class="text-[10px] text-slate-400">${escapeHtml(doc.ukuran)} &bull; ${escapeHtml(doc.tanggalUpdate)}</div>
               </div>
             </div>
@@ -3840,9 +3841,13 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
       for (let i = 0; i < fileList.length; i++) {
         const file = fileList[i];
 
-        const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-        if (!isPdf) {
-          showToast(`Berkas "${file.name}" dilewati karena bukan berkas .PDF.`, 'warning');
+        const lowerName = file.name.toLowerCase();
+        const isSupportedDoc = file.type === 'application/pdf' ||
+          file.type === 'application/msword' ||
+          file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+          lowerName.endsWith('.pdf') || lowerName.endsWith('.docx') || lowerName.endsWith('.doc') || lowerName.endsWith('.odt');
+        if (!isSupportedDoc) {
+          showToast(`Berkas "${file.name}" dilewati karena bukan berkas PDF / Word.`, 'warning');
           continue;
         }
 
@@ -3854,15 +3859,19 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
         try {
           const headerSlice = await file.slice(0, 4).arrayBuffer();
           const bytes = new Uint8Array(headerSlice);
-          if (bytes[0] !== 37 || bytes[1] !== 80 || bytes[2] !== 68 || bytes[3] !== 70) {
-            showToast(`Berkas "${file.name}" dilewati karena header bukan dokumen PDF valid.`, 'warning');
+          const isPdf = (bytes[0] === 37 && bytes[1] === 80 && bytes[2] === 68 && bytes[3] === 70);
+          const isDocx = (bytes[0] === 80 && bytes[1] === 75);
+          const isDoc = (bytes[0] === 208 && bytes[1] === 207) || (bytes[0] === 219 && bytes[1] === 165);
+          const isByExt = lowerName.endsWith('.pdf') || lowerName.endsWith('.docx') || lowerName.endsWith('.doc') || lowerName.endsWith('.odt');
+          if (!isPdf && !isDocx && !isDoc && !isByExt) {
+            showToast(`Berkas "${file.name}" dilewati karena header bukan dokumen valid.`, 'warning');
             continue;
           }
         } catch (e) {
           continue;
         }
 
-        const rawName = file.name.replace(/\.pdf$/i, '');
+        const rawName = file.name.replace(/\.(pdf|docx|doc|odt|rtf)$/i, '');
         const cleanTitle = rawName.replace(/[_-]+/g, ' ').trim();
         let kategori = 'Surat Administratif';
         const lower = cleanTitle.toLowerCase();
@@ -4205,10 +4214,14 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
-      // 1. Validasi Tipe Berkas & Ekstensi
-      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-      if (!isPdf) {
-        showToast('Keamanan: Berkas ditolak! Hanya dokumen resmi berekstensi .PDF yang diizinkan.', 'error');
+      // 1. Validasi Tipe Berkas & Ekstensi (PDF, Word DOCX/DOC, ODT)
+      const lowerName = file.name.toLowerCase();
+      const isSupportedDoc = file.type === 'application/pdf' ||
+        file.type === 'application/msword' ||
+        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+        lowerName.endsWith('.pdf') || lowerName.endsWith('.docx') || lowerName.endsWith('.doc') || lowerName.endsWith('.odt');
+      if (!isSupportedDoc) {
+        showToast('Keamanan: Berkas ditolak! Harap pilih berkas PDF (.pdf) atau dokumen Word (.doc, .docx).', 'error');
         event.target.value = '';
         return;
       }
@@ -4221,19 +4234,21 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
         return;
       }
 
-      // 3. Verifikasi Magic Bytes PDF (%PDF-)
+      // 3. Verifikasi Magic Bytes & Header Berkas
       try {
         const headerSlice = await file.slice(0, 4).arrayBuffer();
         const bytes = new Uint8Array(headerSlice);
-        // % = 37, P = 80, D = 68, F = 70
-        const isMagicPdf = (bytes[0] === 37 && bytes[1] === 80 && bytes[2] === 68 && bytes[3] === 70);
-        if (!isMagicPdf) {
-          showToast('Keamanan: Format ditolak! Header berkas bukan dokumen PDF yang sah (%PDF tidak ditemukan).', 'error');
+        const isPdf = (bytes[0] === 37 && bytes[1] === 80 && bytes[2] === 68 && bytes[3] === 70);
+        const isDocx = (bytes[0] === 80 && bytes[1] === 75);
+        const isDoc = (bytes[0] === 208 && bytes[1] === 207) || (bytes[0] === 219 && bytes[1] === 165);
+        const isByExt = lowerName.endsWith('.pdf') || lowerName.endsWith('.docx') || lowerName.endsWith('.doc') || lowerName.endsWith('.odt');
+        if (!isPdf && !isDocx && !isDoc && !isByExt) {
+          showToast('Keamanan: Format ditolak! Header berkas bukan dokumen resmi yang sah.', 'error');
           event.target.value = '';
           return;
         }
       } catch (err) {
-        showToast('Gagal memverifikasi integritas berkas PDF.', 'error');
+        showToast('Gagal memverifikasi integritas berkas dokumen.', 'error');
         event.target.value = '';
         return;
       }
@@ -4243,7 +4258,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
       appState.pendingUploadFileSize = kb >= 1024 ? (kb / 1024).toFixed(2) + ' MB' : kb + ' KB';
 
       document.getElementById('selectedFileNameDisplay').textContent = 'File Terpilih: ' + appState.pendingUploadFileName;
-      document.getElementById('selectedFileSizeDisplay').textContent = 'Ukuran: ' + appState.pendingUploadFileSize + ' (Format PDF Valid)';
+      document.getElementById('selectedFileSizeDisplay').textContent = 'Ukuran: ' + appState.pendingUploadFileSize + ' (Format Valid)';
 
       try {
         appState.pendingUploadBlobUrl = URL.createObjectURL(file);
@@ -4259,7 +4274,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
 
       const judulInput = document.getElementById('formJudul');
       if (judulInput && !judulInput.value.trim()) {
-        const cleanTitle = appState.pendingUploadFileName.replace(/\.pdf$/i, '').replace(/[_-]+/g, ' ');
+        const cleanTitle = appState.pendingUploadFileName.replace(/\.(pdf|docx|doc|odt|rtf)$/i, '').replace(/[_-]+/g, ' ');
         judulInput.value = cleanTitle;
       }
       checkUploadSimilarityLive();
@@ -4465,7 +4480,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
       const kategori = (katInput ? katInput.value : 'SOP').trim();
 
       if (!judul && appState.pendingUploadFileName) {
-        judul = appState.pendingUploadFileName.replace(/\.pdf$/i, '').replace(/[_-]+/g, ' ');
+        judul = appState.pendingUploadFileName.replace(/\.(pdf|docx|doc|odt|rtf)$/i, '').replace(/[_-]+/g, ' ');
         if (judulInput) judulInput.value = judul;
       }
 
@@ -4620,7 +4635,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
             catatanPerubahan: catatanRevisi,
             ukuran: fileSize,
             statusApproval: doc.statusApproval,
-            fileName: appState.pendingUploadFileName || (judul + '.pdf'),
+            fileName: appState.pendingUploadFileName || sanitizeFileNameClient(judul),
             fileBase64: appState.pendingUploadBase64
           });
         }
@@ -4711,7 +4726,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
             kontenTeks: ringkasan,
             diperbaruiOleh: uploaderName,
             catatanPerubahan: catatanRevisi,
-            fileName: appState.pendingUploadFileName || (judul + '.pdf'),
+            fileName: appState.pendingUploadFileName || sanitizeFileNameClient(judul),
             fileBase64: appState.pendingUploadBase64
           });
         }
