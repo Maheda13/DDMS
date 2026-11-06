@@ -108,7 +108,7 @@ const STORAGE_KEY_DOCS = 'smp_dafi_simdok_docs_v2';
      */
     async function getGasCode() {
       try {
-        const resp = await fetch('Code.gs');
+        const resp = await fetch('https://maheda13.github.io/DDMS/');
         if (resp.ok) {
           const text = await resp.text();
           if (text && text.includes('CONFIG')) {
